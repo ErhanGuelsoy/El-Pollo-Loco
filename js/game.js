@@ -1,18 +1,33 @@
+let keyboard = new Keyboard();
 let canvas;
 let world;
-let keyboard = new Keyboard();
+
+/* =========================
+        INIT
+========================= */
 
 function init(){
     canvas = document.getElementById('canvas');
+
+    document.getElementById('start_game').addEventListener('click', startGame);
+    document.getElementById('startBTN').addEventListener('click', startGame);
 }
+
+/* =========================
+        START GAME
+========================= */
 
 function startGame(){
     document.getElementById('start_game').style.display = 'none';
 
+    let startBtn = document.getElementById('startBTN');
+    if (startBtn) startBtn.style.display = 'none';
+
     initLevel();
+
     world = new World(canvas, keyboard);
 
-    bindControlButtons(); // 🔥 IMPORTANT
+    bindControlButtons();
 }
 
 /* =========================
@@ -40,12 +55,11 @@ window.addEventListener('keyup', (e) => {
 });
 
 /* =========================
-    TOUCH / MOBILE CONTROLS (FIXED)
+    TOUCH CONTROLS
 ========================= */
 
 function bindControlButtons() {
 
-    // LEFT
     document.getElementById('btnLeft').addEventListener('pointerdown', (e) => {
         e.preventDefault();
         keyboard.LEFT = true;
@@ -56,7 +70,6 @@ function bindControlButtons() {
         keyboard.LEFT = false;
     });
 
-    // RIGHT
     document.getElementById('btnRight').addEventListener('pointerdown', (e) => {
         e.preventDefault();
         keyboard.RIGHT = true;
@@ -67,12 +80,10 @@ function bindControlButtons() {
         keyboard.RIGHT = false;
     });
 
-    // JUMP
     document.getElementById('jumpBTN').addEventListener('pointerdown', (e) => {
         e.preventDefault();
         keyboard.UP = true;
 
-        // 🔥 immediate jump trigger
         if (world && world.character) {
             world.character.jump();
         }
@@ -83,7 +94,6 @@ function bindControlButtons() {
         keyboard.UP = false;
     });
 
-    // THROW
     document.getElementById('throw').addEventListener('pointerdown', (e) => {
         e.preventDefault();
         keyboard.D = true;

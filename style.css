@@ -54,9 +54,14 @@ canvas {
     object-fit: cover;
 }
 
+/* ========================= */
+/* CONTROLS */
+/* ========================= */
+
 .controls-bottom {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
     max-width: 720px;
 }
@@ -65,15 +70,28 @@ canvas {
     display: flex;
     flex-direction: row;
     gap: 15px;
+    align-items: center;
 }
 
+/* LINKS */
 .left-panel {
     justify-content: flex-start;
 }
 
+/* MITTE (START BUTTON) */
+.center-panel {
+    justify-content: center;
+    flex: 1;
+}
+
+/* RECHTS */
 .right-panel {
     justify-content: flex-end;
 }
+
+/* ========================= */
+/* BUTTON STYLE */
+/* ========================= */
 
 .control-btn {
     width: 55px;
@@ -92,6 +110,10 @@ canvas {
     transform: scale(0.9);
 }
 
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
 @media (max-width: 768px) {
     h1 {
         font-size: 40px;
@@ -103,6 +125,10 @@ canvas {
         font-size: 20px;
     }
 }
+
+/* ========================= */
+/* FONT */
+/* ========================= */
 
 @font-face {
     font-family: 'zabras';
