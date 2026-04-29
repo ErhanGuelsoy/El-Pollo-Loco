@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Pollo Loco</title>
 
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <link rel="stylesheet" href="style.css">
 
     <script src="models/drawable-object.class.js"></script>
@@ -26,46 +25,60 @@
 
 <body onload="init()">
 
-    <h1>El Pollo Loco</h1>
+<h1>El Pollo Loco</h1>
 
-    <div id="gameContainer">
+<div id="gameContainer">
 
-        <!-- GAME AREA -->
-        <div class="game-area">
+    <div class="game-area">
 
-            <!-- STARTSCREEN -->
-            <div id="start_game" onclick="startGame()">
-                <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="start screen">
-            </div>
-
-            <!-- CANVAS -->
-            <canvas id="canvas" width="720" height="480"></canvas>
-
+        <div id="start_game" onclick="startGame()">
+            <img src="img/9_intro_outro_screens/start/startscreen_1.png">
         </div>
 
-        <!-- BUTTONS -->
-        <div class="controls-bottom">
+        <canvas id="canvas" width="720" height="480"></canvas>
 
-            <!-- LINKS -->
-            <div class="control-panel left-panel">
+        <!-- PLAY OVERLAY -->
+        <div id="playOverlay">
+            <button id="startBTN" class="control-btn">▶</button>
+            <span id="playLabel" class="control-label">Play</span>
+        </div>
+
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls-bottom">
+
+        <!-- LEFT -->
+        <div class="control-panel left-panel">
+            <div class="arrow-group">
                 <button id="btnLeft" class="control-btn">←</button>
                 <button id="btnRight" class="control-btn">→</button>
             </div>
 
-            <!-- START BUTTON (CENTER) -->
-            <div class="control-panel center-panel">
-                <button id="startBTN" class="control-btn">▶</button>
-            </div>
+            <span class="control-label-wide">
+                Arrow left / right = Move
+            </span>
+        </div>
 
-            <!-- RECHTS -->
-            <div class="control-panel right-panel">
-                <button id="jumpBTN" class="control-btn">↑</button>
+        <!-- MIDDLE (THROW) -->
+        <div class="control-panel center-panel">
+            <div class="control-item">
                 <button id="throw" class="control-btn">↘</button>
+                <span class="control-label">Spacebar = Throw Tobasco</span>
             </div>
+        </div>
 
+        <!-- RIGHT -->
+        <div class="control-panel right-panel">
+            <div class="control-item">
+                <button id="jumpBTN" class="control-btn">↑</button>
+                <span class="control-label">Arrow Up = Jump</span>
+            </div>
         </div>
 
     </div>
+
+</div>
 
 </body>
 </html>

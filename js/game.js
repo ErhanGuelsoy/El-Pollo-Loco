@@ -18,15 +18,20 @@ function init(){
 ========================= */
 
 function startGame(){
+
+    // Startscreen ausblenden
     document.getElementById('start_game').style.display = 'none';
 
-    let startBtn = document.getElementById('startBTN');
-    if (startBtn) startBtn.style.display = 'none';
+    // Play Overlay ausblenden
+    document.getElementById('playOverlay').style.display = 'none';
 
+    // Level laden
     initLevel();
 
+    // World erstellen
     world = new World(canvas, keyboard);
 
+    // Touch Controls aktivieren
     bindControlButtons();
 }
 
