@@ -1,0 +1,110 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    background-image: url("img/background/background/sketch1999-desert-5385998 (1).png");
+    background-position: center;
+    background-size: cover;
+    font-family: "zabras", Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    font-size: 64px;
+    letter-spacing: 3px;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+#gameContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    padding: 10px;
+}
+
+.game-area {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    aspect-ratio: 3 / 2;
+    background-color: black;
+}
+
+#start_game {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    cursor: pointer;
+}
+
+#start_game img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.controls-bottom {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 720px;
+}
+
+.control-panel {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+.left-panel {
+    justify-content: flex-start;
+}
+
+.right-panel {
+    justify-content: flex-end;
+}
+
+.control-btn {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background-color: #d98c2b;
+    border: 2px solid black;
+    color: black;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+}
+
+.control-btn:active {
+    transform: scale(0.9);
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 40px;
+    }
+
+    .control-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+}
+
+@font-face {
+    font-family: 'zabras';
+    src: url('fonts/Zabars.ttf') format('truetype');
+}
