@@ -6,10 +6,18 @@ class World {
     ctx;
     keyboard;
     camera_x = 0;
-    statusBar = new StatusBar();
-    throwableObjects = [];  
-    lastThrowTime = 0;
 
+    // =========================
+    // STATUSBARS (MODERN ARRAY)
+    // =========================
+    statusBars = [
+        new StatusBar("health"),
+        new StatusBar("bottle"),
+        new StatusBar("endboss")
+    ];
+
+    throwableObjects = [];
+    lastThrowTime = 0;
     endbossTriggered = false;
 
     constructor(canvas, keyboard) {
@@ -18,6 +26,23 @@ class World {
         this.keyboard = keyboard;
 
         this.setWorld();
+
+        // =========================
+        // POSITIONEN + INIT
+        // =========================
+        this.statusBars[0].x = 20;
+        this.statusBars[0].y = 0;
+
+        this.statusBars[1].x = 20;
+        this.statusBars[1].y = 70;
+
+        this.statusBars[2].x = 20;
+        this.statusBars[2].y = 140;
+
+        this.statusBars[0].setPercentage(100);
+        this.statusBars[1].setPercentageBottle(100);
+        this.statusBars[2].setPercentageEndboss(100);
+
         this.draw();
         this.run();
     }
@@ -25,7 +50,6 @@ class World {
     setWorld() {
         this.character.world = this;
 
-        // 🔥 Endboss bekommt World Zugriff
         this.level.enemies.forEach(enemy => {
             if (enemy instanceof Endboss) {
                 enemy.world = this;
@@ -39,27 +63,17 @@ class World {
             this.checkCollisions();
             this.checkThrowObjects();
 
-            // =========================
-            // MOVE LEFT / RIGHT (LIMIT 2600)
-            // =========================
-
-
             if (this.keyboard.RIGHT && this.character.x < this.level.level_end_x) {
                 this.character.moveRight();
             }
-            
+
             if (this.keyboard.LEFT && this.character.x > 0) {
                 this.character.moveLeft();
             }
 
-            // JUMP
             if (this.keyboard.UP) {
                 this.character.jump();
             }
-
-            // =========================
-            // END BOSS TRIGGER
-            // =========================
 
             if (this.character.x > 2300 && !this.endbossTriggered) {
                 this.endbossTriggered = true;
@@ -86,31 +100,45 @@ class World {
             );
 
             this.throwableObjects.push(bottle);
-
             this.lastThrowTime = now;
         }
     }
 
     checkCollisions() {
         this.level.enemies.forEach((enemy) => {
+
             if (this.character.isColliding(enemy) && !this.character.isHurt()) {
+
                 this.character.hit();
-                this.statusBar.setPercentage(this.character.energy);
+
+                // HEALTH UPDATE
+                this.statusBars[0].setPercentage(this.character.energy);
             }
         });
     }
 
+    // =========================
+    // DRAW LOOP
+    // =========================
     draw() {
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        // WORLD
         this.ctx.translate(this.camera_x, 0);
         this.addObjectsToMap(this.level.backgroundObjects);
-
         this.ctx.translate(-this.camera_x, 0);
-        this.addToMap(this.statusBar);
+
+        // =========================
+        // UI (OHNE CAMERA)
+        // =========================
+        this.statusBars.forEach(bar => {
+            this.addToMap(bar);
+        });
 
         this.ctx.translate(this.camera_x, 0);
 
+        // GAME OBJECTS
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.clouds);
         this.addObjectsToMap(this.level.enemies);
@@ -118,12 +146,12 @@ class World {
 
         this.ctx.translate(-this.camera_x, 0);
 
-        let self = this;
-        requestAnimationFrame(function () {
-            self.draw();
-        });
+        requestAnimationFrame(() => this.draw());
     }
 
+    // =========================
+    // HELPERS
+    // =========================
     addObjectsToMap(objects) {
         objects.forEach(o => this.addToMap(o));
     }

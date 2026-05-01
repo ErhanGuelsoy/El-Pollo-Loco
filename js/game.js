@@ -2,20 +2,12 @@ let keyboard = new Keyboard();
 let canvas;
 let world;
 
-/* =========================
-        INIT
-========================= */
-
 function init(){
     canvas = document.getElementById('canvas');
-
     document.getElementById('start_game').addEventListener('click', startGame);
     document.getElementById('startBTN').addEventListener('click', startGame);
 }
 
-/* =========================
-        START GAME
-========================= */
 
 function startGame(){
 
@@ -34,10 +26,6 @@ function startGame(){
     // Touch Controls aktivieren
     bindControlButtons();
 }
-
-/* =========================
-        KEYBOARD
-========================= */
 
 window.addEventListener('keydown', (e) => {
 
@@ -58,10 +46,6 @@ window.addEventListener('keyup', (e) => {
     if (e.keyCode == 32) keyboard.SPACE = false;
     if (e.keyCode == 68) keyboard.D = false;
 });
-
-/* =========================
-    TOUCH CONTROLS
-========================= */
 
 function bindControlButtons() {
 

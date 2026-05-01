@@ -8,6 +8,7 @@ body {
     background-image: url("img/background/background/sketch1999-desert-5385998 (1).png");
     background-position: center;
     background-size: cover;
+
     font-family: "zabras", Arial, Helvetica, sans-serif;
 }
 
@@ -44,7 +45,10 @@ canvas {
     background-color: black;
 }
 
+/* ========================= */
 /* START SCREEN */
+/* ========================= */
+
 #start_game {
     position: absolute;
     width: 100%;
@@ -52,6 +56,13 @@ canvas {
     z-index: 10;
     cursor: pointer;
 }
+
+/* 👉 WICHTIG: Wenn Bars nicht sichtbar sind, testweise aktivieren */
+/*
+#start_game {
+    display: none;
+}
+*/
 
 #start_game img {
     width: 100%;
@@ -191,7 +202,10 @@ canvas {
     }
 }
 
+/* ========================= */
 /* FONT */
+/* ========================= */
+
 @font-face {
     font-family: 'zabras';
     src: url('fonts/Zabars.ttf') format('truetype');
