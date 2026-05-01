@@ -7,9 +7,6 @@ class World {
     keyboard;
     camera_x = 0;
 
-    // =========================
-    // STATUSBARS (MODERN ARRAY)
-    // =========================
     statusBars = [
         new StatusBar("health"),
         new StatusBar("bottle"),
@@ -27,9 +24,7 @@ class World {
 
         this.setWorld();
 
-        // =========================
-        // POSITIONEN + INIT
-        // =========================
+        // POSITIONEN
         this.statusBars[0].x = 20;
         this.statusBars[0].y = 0;
 
@@ -39,6 +34,7 @@ class World {
         this.statusBars[2].x = 20;
         this.statusBars[2].y = 140;
 
+        // INIT
         this.statusBars[0].setPercentage(100);
         this.statusBars[1].setPercentageBottle(100);
         this.statusBars[2].setPercentageEndboss(100);
@@ -88,6 +84,9 @@ class World {
         }, 1000 / 60);
     }
 
+    // =========================
+    // THROW LOGIC
+    // =========================
     checkThrowObjects() {
 
         let now = new Date().getTime();
@@ -96,11 +95,20 @@ class World {
 
             let bottle = new ThrowableObject(
                 this.character.x + 100,
-                this.character.y + 100
+                this.character.y + 100,
+                this
             );
 
             this.throwableObjects.push(bottle);
             this.lastThrowTime = now;
+
+            // 🔥 STATUSBAR -20%
+            let bottleBar = this.statusBars[1];
+
+            let newValue = bottleBar.percentageBottle - 20;
+            if (newValue < 0) newValue = 0;
+
+            bottleBar.setPercentageBottle(newValue);
         }
     }
 
@@ -124,21 +132,18 @@ class World {
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // WORLD
         this.ctx.translate(this.camera_x, 0);
         this.addObjectsToMap(this.level.backgroundObjects);
         this.ctx.translate(-this.camera_x, 0);
 
-        // =========================
-        // UI (OHNE CAMERA)
-        // =========================
+        // UI
         this.statusBars.forEach(bar => {
             this.addToMap(bar);
         });
 
         this.ctx.translate(this.camera_x, 0);
 
-        // GAME OBJECTS
+        // GAME
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.clouds);
         this.addObjectsToMap(this.level.enemies);
@@ -149,9 +154,6 @@ class World {
         requestAnimationFrame(() => this.draw());
     }
 
-    // =========================
-    // HELPERS
-    // =========================
     addObjectsToMap(objects) {
         objects.forEach(o => this.addToMap(o));
     }

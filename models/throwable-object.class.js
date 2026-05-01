@@ -1,21 +1,22 @@
-class ThrowableObject extends MovableObject{
+class ThrowableObject extends MovableObject {
 
-    constructor(x, y){
+    constructor(x, y, world) {
         super();
+        this.world = world;
         this.loadImage('img/6_salsa_bottle/bottle_rotation/1_bottle_rotation.png');
         this.x = x;
         this.y = y;
         this.height = 70;
         this.width = 60;
-        this.throw();
 
+        this.throw();
     }
 
-    throw(){
+    throw() {
         this.speedY = 30;
         this.applyGravity();
         setInterval(() => {
             this.x += 10;
-        }, 25)
+        }, 25);
     }
 }
