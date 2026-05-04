@@ -17,7 +17,7 @@ class World {
     lastThrowTime = 0;
     endbossTriggered = false;
 
-    gameEnded = false; // 🔥 NEU
+    gameEnded = false;
 
     constructor(canvas, keyboard) {
         this.canvas = canvas;
@@ -53,7 +53,7 @@ class World {
     run() {
         setInterval(() => {
 
-            if (this.gameEnded) return; // 🔥 stop game logic
+            if (this.gameEnded) return;
 
             this.checkCollisions();
             this.checkThrowObjects();
@@ -83,9 +83,7 @@ class World {
                 });
             }
 
-            // =========================
-            // WIN CONDITION CHECK
-            // =========================
+            // WIN CONDITION
             let endboss = this.level.enemies.find(e => e instanceof Endboss);
 
             if (endboss && endboss.energy <= 0 && !this.gameEnded) {
@@ -124,24 +122,38 @@ class World {
     }
 
     // =========================
-    // COLLISIONS
+    // COLLISIONS (FIXED AUDIO)
     // =========================
     checkCollisions() {
 
         this.level.enemies.forEach((enemy) => {
 
+            // =========================
+            // CHARACTER HIT ENEMY
+            // =========================
             if (this.character.isColliding(enemy) && !this.character.isHurt()) {
                 this.character.hit();
                 this.statusBars[0].setPercentage(this.character.energy);
             }
 
+            // =========================
+            // BOTTLE COLLISION
+            // =========================
             this.throwableObjects.forEach((bottle, index) => {
 
                 if (bottle.isColliding(enemy)) {
 
+                    // 🐔 END BOSS HIT + SOUND FIX
                     if (enemy instanceof Endboss) {
+
                         enemy.hit();
                         this.statusBars[2].reduceEndboss();
+
+                        // 🔥 AUDIO FIX HERE
+                        if (window.playEndbossSound) {
+                            playEndbossSound();
+                        }
+
                     } else {
                         enemy.hit();
                     }
@@ -170,7 +182,6 @@ class World {
 
         this.ctx.translate(-this.camera_x, 0);
 
-        // StatusBars fixed
         this.statusBars.forEach(bar => {
             this.addToMap(bar);
         });

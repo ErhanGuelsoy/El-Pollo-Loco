@@ -2,9 +2,10 @@ class GameAudio {
 
     AUDIO_FILES = [
         "audio/dragon-studio-car-crash-sound-376882.mp3",
-        "audio/freesound_community-cartoon-jump-6462.mp3", // 🦘 JUMP
+        "audio/freesound_community-cartoon-jump-6462.mp3",
         "audio/liecio-collect-points-190037.mp3",
-        "audio/spinopel-run-on-asphalt-road-393093.mp3"
+        "audio/spinopel-run-on-asphalt-road-393093.mp3",
+        "audio/freesound_community-chicken-single-alarm-call-6056.mp3" // 🐔 END BOSS
     ];
 
     constructor() {
@@ -13,9 +14,16 @@ class GameAudio {
     }
 
     loadSounds() {
-        this.AUDIO_FILES.forEach((path) => {
+        this.AUDIO_FILES.forEach((path, i) => {
             let audio = new Audio(path);
             audio.preload = "auto";
+
+            // 🏃 RUN LOOP
+            if (i === 3) {
+                audio.loop = true;
+                audio.volume = 0.4;
+            }
+
             this.sounds.push(audio);
         });
     }
@@ -23,13 +31,20 @@ class GameAudio {
     play(index) {
         if (this.sounds[index]) {
             this.sounds[index].currentTime = 0;
-            this.sounds[index].play();
+            this.sounds[index].play().catch(() => {});
         }
     }
 
     muteAll(muted) {
+        this.sounds.forEach(sound => sound.muted = muted);
+    }
+
+    unlock() {
         this.sounds.forEach(sound => {
-            sound.muted = muted;
+            sound.play().then(() => {
+                sound.pause();
+                sound.currentTime = 0;
+            }).catch(() => {});
         });
     }
 }
@@ -40,7 +55,9 @@ let canvas;
 let world;
 let gameAudio;
 let isMuted = false;
-let canJumpSound = true; // 🔥 spam protection
+
+let canJumpSound = true;
+let isRunning = false;
 
 // ================= INIT =================
 function init(){
@@ -54,9 +71,7 @@ function init(){
     audioBTN.addEventListener("click", () => {
         isMuted = !isMuted;
 
-        if (gameAudio) {
-            gameAudio.muteAll(isMuted);
-        }
+        if (gameAudio) gameAudio.muteAll(isMuted);
 
         audioBTN.innerText = isMuted ? "🔇" : "🔊";
     });
@@ -73,31 +88,48 @@ function startGame(){
     world = new World(canvas, keyboard);
 
     gameAudio = new GameAudio();
+    gameAudio.unlock(); // 🔓 IMPORTANT
 
     bindControlButtons();
 }
 
-// ================= RESTART / MENU =================
-function restartGame() {
-    location.reload();
-}
-
-function backToMenu() {
-    location.reload();
-}
-
-// ================= JUMP SOUND =================
+// ================= JUMP =================
 function triggerJump() {
-
     if (!gameAudio || !canJumpSound) return;
 
-    gameAudio.play(1); // 🦘 jump sound
+    gameAudio.play(1);
 
     canJumpSound = false;
 
     setTimeout(() => {
         canJumpSound = true;
     }, 300);
+}
+
+// ================= RUN =================
+function handleRunSound() {
+
+    if (!gameAudio) return;
+
+    const moving = keyboard.LEFT || keyboard.RIGHT;
+
+    if (moving && !isRunning) {
+        gameAudio.sounds[3].play().catch(() => {});
+        isRunning = true;
+    }
+
+    if (!moving && isRunning) {
+        gameAudio.sounds[3].pause();
+        gameAudio.sounds[3].currentTime = 0;
+        isRunning = false;
+    }
+}
+
+// ================= END BOSS SOUND (SAFE) =================
+function playEndbossSound() {
+    if (gameAudio) {
+        gameAudio.play(4); // 🐔 END BOSS SOUND
+    }
 }
 
 // ================= KEYBOARD =================
@@ -108,7 +140,6 @@ window.addEventListener('keydown', (e) => {
     if (e.keyCode == 38) keyboard.UP = true;
     if (e.keyCode == 40) keyboard.DOWN = true;
 
-    // 🦘 SPACE = JUMP + SOUND
     if (e.keyCode == 32) {
         keyboard.SPACE = true;
         triggerJump();
@@ -136,7 +167,6 @@ function bindControlButtons() {
     document.getElementById('btnRight').addEventListener('pointerdown', e => keyboard.RIGHT = true);
     document.getElementById('btnRight').addEventListener('pointerup', e => keyboard.RIGHT = false);
 
-    // 🦘 BUTTON JUMP + SOUND
     document.getElementById('jumpBTN').addEventListener('pointerdown', e => {
         keyboard.UP = true;
         triggerJump();
