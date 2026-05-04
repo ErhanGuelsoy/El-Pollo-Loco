@@ -17,21 +17,30 @@ class Chicken extends MovableObject {
         this.loadImage("img/3_enemies_chicken/chicken_normal/1_walk/1_w.png");
         this.loadImages(this.IMAGES_WALKING);
 
-        this.x = 200 + Math.random() * 500; // Zahl zwischen 200 und 700
+        // ✅ weiter weg spawnen
+        this.x = 800 + Math.random() * 1000;
+
         this.speed = 0.20 + Math.random() * 0.25;
 
-        this.animate();
+        // ✅ verzögerter Start
+        setTimeout(() => {
+            this.animate();
+        }, Math.random() * 3000); // 0–3 Sekunden Delay
     }
-
-
 
     animate(){
-        setInterval(() => {
-            this.moveLeft();
-        }, 1000 / 60);
 
-        setInterval(() => {
-        this.playAnimation(this.IMAGES_WALKING)
-        }, 200);
+        // ⏱️ Startverzögerung
+        setTimeout(() => {
+    
+            setInterval(() => {
+                this.moveLeft();
+            }, 1000 / 60);
+    
+            setInterval(() => {
+                this.playAnimation(this.IMAGES_WALKING)
+            }, 200);
+    
+        }, Math.random() * 3000); // 0–3 Sekunden Delay
     }
-}
+    }

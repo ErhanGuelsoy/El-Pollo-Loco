@@ -23,14 +23,11 @@ class World {
         this.keyboard = keyboard;
 
         this.setWorld();
-
         // POSITIONEN
         this.statusBars[0].x = 20;
         this.statusBars[0].y = 0;
-
         this.statusBars[1].x = 20;
         this.statusBars[1].y = 70;
-
         this.statusBars[2].x = 20;
         this.statusBars[2].y = 140;
 
@@ -38,7 +35,6 @@ class World {
         this.statusBars[0].setPercentage(100);
         this.statusBars[1].setPercentageBottle(100);
         this.statusBars[2].setPercentageEndboss(100);
-
         this.draw();
         this.run();
     }
@@ -101,7 +97,6 @@ class World {
 
             this.throwableObjects.push(bottle);
             this.lastThrowTime = now;
-
             // 🔥 STATUSBAR -20%
             let bottleBar = this.statusBars[1];
 

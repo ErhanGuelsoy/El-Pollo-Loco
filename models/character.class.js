@@ -56,7 +56,6 @@ class Character extends MovableObject {
 
     }
 
-    
     animate(){
 
         setInterval(() =>{
@@ -66,7 +65,6 @@ class Character extends MovableObject {
                 this.otherDirection = false;
             }
                 
-
             if(this.world.keyboard.LEFT && this.x > 0){
                 this.moveLeft()
                 this.otherDirection = true;

@@ -16,7 +16,6 @@ animate(){
 this.moveLeft()
 }
 
-
 moveLeft(){
     setInterval(() => {
         this.x -= 0.2;

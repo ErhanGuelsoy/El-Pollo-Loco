@@ -38,16 +38,13 @@ class StatusBar extends DrawableObject {
         super();
 
         this.type = type;
-
         this.x = 60;
         this.y = 0;
         this.width = 250;
         this.height = 80;
-
         this.loadImages(this.IMAGES);
         this.loadImages(this.IMAGES_Statusbar_Bottle);
         this.loadImages(this.IMAGES_Statusbar_Endboss);
-
         this.setPercentage(100);
     }
 
@@ -74,10 +71,8 @@ class StatusBar extends DrawableObject {
     // =========================
     setPercentageBottle(percentageBottle){
         this.percentageBottle = percentageBottle;
-    
         let index = this.resolveImageIndexBottle();
         let path = this.IMAGES_Statusbar_Bottle[index];
-    
         this.img = this.imageCache[path];
     }
 
