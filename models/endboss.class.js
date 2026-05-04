@@ -1,8 +1,10 @@
-class Endboss extends MovableObject{
+class Endboss extends MovableObject {
 
     height = 400;
     width = 250;
     y = 50;
+
+    energy = 100;
 
     IMAGES_WALKING = [
         "img/4_enemie_boss_chicken/2_alert/G5.png",
@@ -11,46 +13,55 @@ class Endboss extends MovableObject{
         "img/4_enemie_boss_chicken/2_alert/G8.png",
         "img/4_enemie_boss_chicken/2_alert/G9.png",
         "img/4_enemie_boss_chicken/2_alert/G10.png",
-        "img/4_enemie_boss_chicken/2_alert/G11.png",
         "img/4_enemie_boss_chicken/2_alert/G11.png"
     ];
 
-    IMAGE_Dead_Chicken = [
-        "img/3_enemies_chicken/chicken_normal/2_dead/dead.png",
-    ]
+    IMAGES_ENDBOSS_DAMAGE = [
+        "img/4_enemie_boss_chicken/4_hurt/G21.png",
+        "img/4_enemie_boss_chicken/4_hurt/G22.png",
+        "img/4_enemie_boss_chicken/4_hurt/G23.png",
+    ];
 
-    hadFirstContact = false;
-    dead = false;
-    
-    constructor(){
+    IMAGES_ENDBOSS_DEATH = [
+        "img/4_enemie_boss_chicken/5_dead/G24.png",
+        "img/4_enemie_boss_chicken/5_dead/G25.png",
+        "img/4_enemie_boss_chicken/5_dead/G26.png",
+    ];
+
+    constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
-        this.loadImages(this.IMAGE_Dead_Chicken);
+        this.loadImages(this.IMAGES_ENDBOSS_DAMAGE);
+        this.loadImages(this.IMAGES_ENDBOSS_DEATH);
+
         this.x = 2300;
         this.animate();
-    
     }
-    
-    animate(){
 
-        let i = 0;  
+    animate() {
+        setInterval(() => {
 
-    setInterval(()=> {
-
-        if (i < 10){
-            this.playAnimation(this.IMAGES_WALKING);
-        
-        } else {
-            this.playAnimation(this.IMAGES_WALKING) // muss noch angepasst werden auf anderen Skill
-        }
-            i++;
-
-            if(world.character.x > 2800 && !hadFirstContact) { // muss noch schauen wie icha uf die x variable komme
-                i = 0;
-                hadFirstContact = 0;
+            if (this.isDead()) {
+                this.playAnimation(this.IMAGES_ENDBOSS_DEATH);
+            } 
+            else if (this.isHurt()) {
+                this.playAnimation(this.IMAGES_ENDBOSS_DAMAGE);
+            } 
+            else {
+                this.playAnimation(this.IMAGES_WALKING);
             }
 
-
         }, 150);
+    }
+
+    // 🔥 20 DAMAGE
+    hit() {
+        this.energy -= 20;
+
+        if (this.energy < 0) {
+            this.energy = 0;
+        } else {
+            this.lastHit = new Date().getTime();
         }
     }
+}

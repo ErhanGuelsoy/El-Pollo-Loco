@@ -24,14 +24,17 @@ class World {
 
         this.setWorld();
 
-        // Statusbars setzen
+        // Statusbars Position
         this.statusBars[0].x = 20;
         this.statusBars[0].y = 0;
+
         this.statusBars[1].x = 20;
         this.statusBars[1].y = 70;
+
         this.statusBars[2].x = 20;
         this.statusBars[2].y = 140;
 
+        // Initialwerte
         this.statusBars[0].setPercentage(100);
         this.statusBars[1].setPercentageBottle(100);
         this.statusBars[2].setPercentageEndboss(100);
@@ -72,7 +75,7 @@ class World {
                 this.character.jump();
             }
 
-            // Endboss trigger
+            // 👑 Endboss Trigger
             if (this.character.x > 2300 && !this.endbossTriggered) {
                 this.endbossTriggered = true;
 
@@ -104,10 +107,12 @@ class World {
             this.throwableObjects.push(bottle);
             this.lastThrowTime = now;
 
-            // Statusbar -20%
+            // 📊 Bottle Statusbar -20%
             let bottleBar = this.statusBars[1];
+
             let newValue = bottleBar.percentageBottle - 20;
             if (newValue < 0) newValue = 0;
+
             bottleBar.setPercentageBottle(newValue);
         }
     }
@@ -127,11 +132,23 @@ class World {
 
             // 🍾 Bottle vs Enemy
             this.throwableObjects.forEach((bottle, index) => {
+
                 if (bottle.isColliding(enemy)) {
 
-                    enemy.hit();
+                    if (enemy instanceof Endboss) {
 
-                    // Flasche entfernen
+                        // 👑 Endboss Damage
+                        enemy.hit();
+
+                        let endbossBar = this.statusBars[2];
+                        endbossBar.reduceEndboss();
+
+                    } else {
+                        // 🐔 Chicken
+                        enemy.hit();
+                    }
+
+                    // 💥 Flasche entfernen
                     this.throwableObjects.splice(index, 1);
                 }
             });
@@ -148,13 +165,13 @@ class World {
         // 📷 Kamera AN
         this.ctx.translate(this.camera_x, 0);
 
-        // 🌄 BACKGROUND
+        // 🌄 Background
         this.addObjectsToMap(this.level.backgroundObjects);
 
         // ☁️ Clouds
         this.addObjectsToMap(this.level.clouds);
 
-        // 🎮 GAME
+        // 🎮 Game Objects
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
         this.addObjectsToMap(this.throwableObjects);
@@ -162,7 +179,7 @@ class World {
         // 📷 Kamera AUS
         this.ctx.translate(-this.camera_x, 0);
 
-        // 📊 UI (ohne Kamera!)
+        // 📊 UI
         this.statusBars.forEach(bar => {
             this.addToMap(bar);
         });
