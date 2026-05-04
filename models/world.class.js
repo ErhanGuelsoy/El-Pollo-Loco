@@ -17,8 +17,7 @@ class World {
     lastThrowTime = 0;
     endbossTriggered = false;
 
-    // 🔥 WIN STATE
-    gameWin = false;
+    gameEnded = false; // 🔥 NEU
 
     constructor(canvas, keyboard) {
         this.canvas = canvas;
@@ -41,24 +40,20 @@ class World {
         });
     }
 
+    // =========================
+    // WIN SCREEN
+    // =========================
     showWinScreen() {
-
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        let img = new Image();
-        img.src = "img/You won, you lost/You won A.png";
-
-        img.onload = () => {
-            this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
-        };
+        document.getElementById('winScreen').classList.remove('hidden');
     }
 
+    // =========================
+    // GAME LOOP
+    // =========================
     run() {
-
         setInterval(() => {
 
-            // 🔥 GAME STOP
-            if (this.gameWin) return;
+            if (this.gameEnded) return; // 🔥 stop game logic
 
             this.checkCollisions();
             this.checkThrowObjects();
@@ -77,6 +72,7 @@ class World {
                 this.character.jump();
             }
 
+            // Endboss Trigger
             if (this.character.x > 2300 && !this.endbossTriggered) {
                 this.endbossTriggered = true;
 
@@ -87,34 +83,22 @@ class World {
                 });
             }
 
-            // 🔥 WIN CHECK (WICHTIG!)
-            this.checkGameWin();
+            // =========================
+            // WIN CONDITION CHECK
+            // =========================
+            let endboss = this.level.enemies.find(e => e instanceof Endboss);
+
+            if (endboss && endboss.energy <= 0 && !this.gameEnded) {
+                this.gameEnded = true;
+                this.showWinScreen();
+            }
 
         }, 1000 / 60);
     }
 
-    checkGameWin() {
-
-        if (this.gameWin) return;
-
-        let endboss = this.level.enemies.find(e => e instanceof Endboss);
-
-        if (!endboss) return;
-
-        if (endboss.energy <= 0) {
-
-            this.gameWin = true;
-
-            this.showWinScreen();
-
-            // stop controls
-            this.keyboard.RIGHT = false;
-            this.keyboard.LEFT = false;
-            this.keyboard.UP = false;
-            this.keyboard.D = false;
-        }
-    }
-
+    // =========================
+    // THROW OBJECTS
+    // =========================
     checkThrowObjects() {
 
         let now = new Date().getTime();
@@ -139,6 +123,9 @@ class World {
         }
     }
 
+    // =========================
+    // COLLISIONS
+    // =========================
     checkCollisions() {
 
         this.level.enemies.forEach((enemy) => {
@@ -165,10 +152,10 @@ class World {
         });
     }
 
+    // =========================
+    // DRAW LOOP
+    // =========================
     draw() {
-
-        // 🔥 stop draw when win
-        if (this.gameWin) return;
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -183,14 +170,17 @@ class World {
 
         this.ctx.translate(-this.camera_x, 0);
 
+        // StatusBars fixed
         this.statusBars.forEach(bar => {
             this.addToMap(bar);
         });
 
-        requestAnimationFrame(() => this.draw);
         requestAnimationFrame(() => this.draw());
     }
 
+    // =========================
+    // HELPERS
+    // =========================
     addObjectsToMap(objects) {
         objects.forEach(o => this.addToMap(o));
     }

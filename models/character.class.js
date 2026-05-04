@@ -2,7 +2,7 @@ class Character extends MovableObject {
 
     height = 280;
     y = 80;
-    speed = 10;
+    speed = 3; // 🔥 langsamer gemacht (vorher 10)
 
     IMAGES_WALKING = [
         "img/2_character_pepe/2_walk/W-21.png",
@@ -53,7 +53,6 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_HURT);
         this.applyGravity();
         this.animate();
-
     }
 
     animate(){
@@ -86,11 +85,10 @@ class Character extends MovableObject {
             } else if (this.isAboveGround()) {
                 this.playAnimation(this.IMAGES_JUMPING);
             } else { 
-
-            if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT){
-                this.playAnimation(this.IMAGES_WALKING)
-            }
+                if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT){
+                    this.playAnimation(this.IMAGES_WALKING)
+                }
             }
         }, 100);
     }
-    }
+}

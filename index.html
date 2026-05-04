@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Pollo Loco</title>
     <link rel="stylesheet" href="style.css">
+
     <script src="models/drawable-object.class.js"></script>
     <script src="models/movable-object.class.js"></script>
     <script src="models/character.class.js"></script>
@@ -35,6 +36,16 @@
 
         <canvas id="canvas" width="720" height="480"></canvas>
 
+        <!-- WIN SCREEN -->
+        <div id="winScreen" class="end-screen hidden">
+            <img src="img/You won, you lost/You Win A.png" alt="You Win">
+
+            <div class="end-buttons">
+                <button class="control-btn" onclick="restartGame()">↻</button>
+                <button class="control-btn" onclick="backToMenu()">🏠</button>
+            </div>
+        </div>
+
         <!-- PLAY OVERLAY -->
         <div id="playOverlay">
             <button id="startBTN" class="control-btn">▶</button>
@@ -46,19 +57,14 @@
     <!-- CONTROLS -->
     <div class="controls-bottom">
 
-        <!-- LEFT -->
         <div class="control-panel left-panel">
             <div class="arrow-group">
                 <button id="btnLeft" class="control-btn">←</button>
                 <button id="btnRight" class="control-btn">→</button>
             </div>
-
-            <span class="control-label-wide">
-                Arrow left / right = Move
-            </span>
+            <span class="control-label-wide">Arrow left / right = Move</span>
         </div>
 
-        <!-- MIDDLE (THROW) -->
         <div class="control-panel center-panel">
             <div class="control-item">
                 <button id="throw" class="control-btn">↘</button>
@@ -66,7 +72,6 @@
             </div>
         </div>
 
-        <!-- RIGHT -->
         <div class="control-panel right-panel">
             <div class="control-item">
                 <button id="jumpBTN" class="control-btn">↑</button>

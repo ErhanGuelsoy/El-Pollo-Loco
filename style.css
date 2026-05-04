@@ -26,10 +26,7 @@ h1 {
     padding: 10px;
 }
 
-/* ========================= */
 /* GAME AREA */
-/* ========================= */
-
 .game-area {
     position: relative;
     width: 100%;
@@ -44,10 +41,7 @@ canvas {
     background-color: black;
 }
 
-/* ========================= */
-/* START SCREEN */
-/* ========================= */
-
+/* START */
 #start_game {
     position: absolute;
     width: 100%;
@@ -56,109 +50,61 @@ canvas {
     cursor: pointer;
 }
 
-/* 👉 WICHTIG: Wenn Bars nicht sichtbar sind, testweise aktivieren */
-/*
-#start_game {
-    display: none;
-}
-*/
-
 #start_game img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* ========================= */
 /* PLAY OVERLAY */
-/* ========================= */
-
 #playOverlay {
     position: absolute;
     top: 20px;
     left: 20px;
     z-index: 20;
-
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
 }
 
-/* ========================= */
 /* CONTROLS */
-/* ========================= */
-
 .controls-bottom {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
     width: 100%;
     max-width: 720px;
 }
 
-/* LEFT */
-.left-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-/* MIDDLE */
-.center-panel {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* RIGHT */
+.left-panel,
+.center-panel,
 .right-panel {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
 }
 
-/* ARROWS */
 .arrow-group {
     display: flex;
     gap: 10px;
 }
 
-/* ITEM */
 .control-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
 }
 
-/* ========================= */
 /* TEXT */
-/* ========================= */
-
 .control-label {
     font-size: 24px;
     font-weight: bold;
-    color: black;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
 }
 
 .control-label-wide {
     font-size: 22px;
-    font-weight: bold;
-    color: black;
-    text-align: center;
-    margin-top: 5px;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
 }
 
-/* ========================= */
 /* BUTTONS */
-/* ========================= */
-
 .control-btn {
     width: 60px;
     height: 60px;
@@ -166,45 +112,43 @@ canvas {
     background-color: #d98c2b;
     border: 2px solid black;
     font-size: 30px;
-    font-weight: bold;
     cursor: pointer;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
 }
 
-.control-btn:active {
-    transform: scale(0.9);
+/* WIN SCREEN */
+.end-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 999;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0,0,0,0.6);
 }
 
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
-
-@media (max-width: 768px) {
-    h1 {
-        font-size: 40px;
-    }
-
-    .control-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 22px;
-    }
-
-    .control-label,
-    .control-label-wide {
-        font-size: 18px;
-    }
-
-    #playOverlay {
-        top: 10px;
-        left: 10px;
-    }
+.end-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* ========================= */
+.end-buttons {
+    position: absolute;
+    bottom: 30px;
+    display: flex;
+    gap: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
 /* FONT */
-/* ========================= */
-
 @font-face {
     font-family: 'zabras';
     src: url('fonts/Zabars.ttf') format('truetype');

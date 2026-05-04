@@ -8,27 +8,27 @@ function init(){
     document.getElementById('startBTN').addEventListener('click', startGame);
 }
 
-
 function startGame(){
 
-    // Startscreen ausblenden
     document.getElementById('start_game').style.display = 'none';
-
-    // Play Overlay ausblenden
     document.getElementById('playOverlay').style.display = 'none';
+    document.getElementById('winScreen').classList.add('hidden');
 
-    // Level laden
     initLevel();
-
-    // World erstellen
     world = new World(canvas, keyboard);
 
-    // Touch Controls aktivieren
     bindControlButtons();
 }
 
-window.addEventListener('keydown', (e) => {
+function restartGame() {
+    location.reload();
+}
 
+function backToMenu() {
+    location.reload();
+}
+
+window.addEventListener('keydown', (e) => {
     if (e.keyCode == 39) keyboard.RIGHT = true;
     if (e.keyCode == 37) keyboard.LEFT = true;
     if (e.keyCode == 38) keyboard.UP = true;
@@ -38,7 +38,6 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('keyup', (e) => {
-
     if (e.keyCode == 39) keyboard.RIGHT = false;
     if (e.keyCode == 37) keyboard.LEFT = false;
     if (e.keyCode == 38) keyboard.UP = false;
@@ -49,47 +48,15 @@ window.addEventListener('keyup', (e) => {
 
 function bindControlButtons() {
 
-    document.getElementById('btnLeft').addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        keyboard.LEFT = true;
-    });
+    document.getElementById('btnLeft').addEventListener('pointerdown', e => keyboard.LEFT = true);
+    document.getElementById('btnLeft').addEventListener('pointerup', e => keyboard.LEFT = false);
 
-    document.getElementById('btnLeft').addEventListener('pointerup', (e) => {
-        e.preventDefault();
-        keyboard.LEFT = false;
-    });
+    document.getElementById('btnRight').addEventListener('pointerdown', e => keyboard.RIGHT = true);
+    document.getElementById('btnRight').addEventListener('pointerup', e => keyboard.RIGHT = false);
 
-    document.getElementById('btnRight').addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        keyboard.RIGHT = true;
-    });
+    document.getElementById('jumpBTN').addEventListener('pointerdown', e => keyboard.UP = true);
+    document.getElementById('jumpBTN').addEventListener('pointerup', e => keyboard.UP = false);
 
-    document.getElementById('btnRight').addEventListener('pointerup', (e) => {
-        e.preventDefault();
-        keyboard.RIGHT = false;
-    });
-
-    document.getElementById('jumpBTN').addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        keyboard.UP = true;
-
-        if (world && world.character) {
-            world.character.jump();
-        }
-    });
-
-    document.getElementById('jumpBTN').addEventListener('pointerup', (e) => {
-        e.preventDefault();
-        keyboard.UP = false;
-    });
-
-    document.getElementById('throw').addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        keyboard.D = true;
-    });
-
-    document.getElementById('throw').addEventListener('pointerup', (e) => {
-        e.preventDefault();
-        keyboard.D = false;
-    });
+    document.getElementById('throw').addEventListener('pointerdown', e => keyboard.D = true);
+    document.getElementById('throw').addEventListener('pointerup', e => keyboard.D = false);
 }
