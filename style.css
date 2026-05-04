@@ -148,6 +148,16 @@ canvas {
     display: none;
 }
 
+#playOverlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 /* FONT */
 @font-face {
     font-family: 'zabras';
