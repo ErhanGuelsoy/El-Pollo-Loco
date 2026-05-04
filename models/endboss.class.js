@@ -15,11 +15,17 @@ class Endboss extends MovableObject{
         "img/4_enemie_boss_chicken/2_alert/G11.png"
     ];
 
+    IMAGE_Dead_Chicken = [
+        "img/3_enemies_chicken/chicken_normal/2_dead/dead.png",
+    ]
+
     hadFirstContact = false;
+    dead = false;
     
     constructor(){
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
+        this.loadImages(this.IMAGE_Dead_Chicken);
         this.x = 2300;
         this.animate();
     
