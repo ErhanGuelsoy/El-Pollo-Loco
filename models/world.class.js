@@ -8,14 +8,17 @@ class World {
     camera_x = 0;
 
     statusBars = [
-        new StatusBar("health"),
-        new StatusBar("bottle"),
-        new StatusBar("endboss")
+        new StatusBar("health", 0),
+        new StatusBar("bottle", 70),
+        new StatusBar("endboss", 140)
     ];
 
     throwableObjects = [];
     lastThrowTime = 0;
     endbossTriggered = false;
+
+    // 🔥 WIN STATE
+    gameWin = false;
 
     constructor(canvas, keyboard) {
         this.canvas = canvas;
@@ -23,21 +26,6 @@ class World {
         this.keyboard = keyboard;
 
         this.setWorld();
-
-        // Statusbars Position
-        this.statusBars[0].x = 20;
-        this.statusBars[0].y = 0;
-
-        this.statusBars[1].x = 20;
-        this.statusBars[1].y = 70;
-
-        this.statusBars[2].x = 20;
-        this.statusBars[2].y = 140;
-
-        // Initialwerte
-        this.statusBars[0].setPercentage(100);
-        this.statusBars[1].setPercentageBottle(100);
-        this.statusBars[2].setPercentageEndboss(100);
 
         this.draw();
         this.run();
@@ -53,16 +41,30 @@ class World {
         });
     }
 
+    showWinScreen() {
+
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        let img = new Image();
+        img.src = "img/You won, you lost/You won A.png";
+
+        img.onload = () => {
+            this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
+        };
+    }
+
     run() {
+
         setInterval(() => {
+
+            // 🔥 GAME STOP
+            if (this.gameWin) return;
 
             this.checkCollisions();
             this.checkThrowObjects();
 
-            // 🧹 Tote Gegner entfernen
             this.level.enemies = this.level.enemies.filter(e => !e.markedForDeletion);
 
-            // Bewegung
             if (this.keyboard.RIGHT && this.character.x < this.level.level_end_x) {
                 this.character.moveRight();
             }
@@ -75,7 +77,6 @@ class World {
                 this.character.jump();
             }
 
-            // 👑 Endboss Trigger
             if (this.character.x > 2300 && !this.endbossTriggered) {
                 this.endbossTriggered = true;
 
@@ -86,12 +87,34 @@ class World {
                 });
             }
 
+            // 🔥 WIN CHECK (WICHTIG!)
+            this.checkGameWin();
+
         }, 1000 / 60);
     }
 
-    // =========================
-    // 🍾 THROW
-    // =========================
+    checkGameWin() {
+
+        if (this.gameWin) return;
+
+        let endboss = this.level.enemies.find(e => e instanceof Endboss);
+
+        if (!endboss) return;
+
+        if (endboss.energy <= 0) {
+
+            this.gameWin = true;
+
+            this.showWinScreen();
+
+            // stop controls
+            this.keyboard.RIGHT = false;
+            this.keyboard.LEFT = false;
+            this.keyboard.UP = false;
+            this.keyboard.D = false;
+        }
+    }
+
     checkThrowObjects() {
 
         let now = new Date().getTime();
@@ -107,7 +130,6 @@ class World {
             this.throwableObjects.push(bottle);
             this.lastThrowTime = now;
 
-            // 📊 Bottle Statusbar -20%
             let bottleBar = this.statusBars[1];
 
             let newValue = bottleBar.percentageBottle - 20;
@@ -117,73 +139,55 @@ class World {
         }
     }
 
-    // =========================
-    // 💥 COLLISIONS
-    // =========================
     checkCollisions() {
 
         this.level.enemies.forEach((enemy) => {
 
-            // 🧍 Character vs Enemy
             if (this.character.isColliding(enemy) && !this.character.isHurt()) {
                 this.character.hit();
                 this.statusBars[0].setPercentage(this.character.energy);
             }
 
-            // 🍾 Bottle vs Enemy
             this.throwableObjects.forEach((bottle, index) => {
 
                 if (bottle.isColliding(enemy)) {
 
                     if (enemy instanceof Endboss) {
-
-                        // 👑 Endboss Damage
                         enemy.hit();
-
-                        let endbossBar = this.statusBars[2];
-                        endbossBar.reduceEndboss();
-
+                        this.statusBars[2].reduceEndboss();
                     } else {
-                        // 🐔 Chicken
                         enemy.hit();
                     }
 
-                    // 💥 Flasche entfernen
                     this.throwableObjects.splice(index, 1);
                 }
             });
         });
     }
 
-    // =========================
-    // 🎨 DRAW LOOP
-    // =========================
     draw() {
+
+        // 🔥 stop draw when win
+        if (this.gameWin) return;
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // 📷 Kamera AN
         this.ctx.translate(this.camera_x, 0);
 
-        // 🌄 Background
         this.addObjectsToMap(this.level.backgroundObjects);
-
-        // ☁️ Clouds
         this.addObjectsToMap(this.level.clouds);
 
-        // 🎮 Game Objects
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
         this.addObjectsToMap(this.throwableObjects);
 
-        // 📷 Kamera AUS
         this.ctx.translate(-this.camera_x, 0);
 
-        // 📊 UI
         this.statusBars.forEach(bar => {
             this.addToMap(bar);
         });
 
+        requestAnimationFrame(() => this.draw);
         requestAnimationFrame(() => this.draw());
     }
 

@@ -85,11 +85,6 @@ canvas {
     gap: 5px;
 }
 
-.button-row {
-    display: flex;
-    gap: 10px;
-}
-
 /* ========================= */
 /* CONTROLS */
 /* ========================= */
@@ -177,46 +172,6 @@ canvas {
 }
 
 .control-btn:active {
-    transform: scale(0.9);
-}
-
-
-/* =========================
-   BUTTON ROW (Start + Music)
-========================= */
-.button-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-/* =========================
-   MUSIC BUTTON STYLE
-========================= */
-
-#soundBTN {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #d98c2b;
-    border: 2px solid black;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Hover */
-#soundBTN:hover {
-    filter: brightness(1.1);
-}
-
-/* Click */
-#soundBTN:active {
     transform: scale(0.9);
 }
 

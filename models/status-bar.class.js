@@ -33,12 +33,15 @@ class StatusBar extends DrawableObject {
 
     type = "health";
 
-    constructor(type = "health") {
+    constructor(type = "health", y = 0) {
         super();
 
         this.type = type;
-        this.x = 60;
-        this.y = 0;
+
+        // 🔥 FIX: näher an linken Rand
+        this.x = 10;
+
+        this.y = y;
         this.width = 250;
         this.height = 80;
 
@@ -46,10 +49,23 @@ class StatusBar extends DrawableObject {
         this.loadImages(this.IMAGES_Statusbar_Bottle);
         this.loadImages(this.IMAGES_Statusbar_Endboss);
 
-        this.setPercentage(100);
+        if (this.type === "health") {
+            this.setPercentage(100);
+        }
+
+        if (this.type === "bottle") {
+            this.setPercentageBottle(100);
+        }
+
+        if (this.type === "endboss") {
+            this.setPercentageEndboss(100);
+        }
     }
 
+    // =========================
     // HEALTH
+    // =========================
+
     setPercentage(percentage) {
         this.percentage = percentage;
         let path = this.IMAGES[this.resolveImageIndex()];
@@ -65,11 +81,13 @@ class StatusBar extends DrawableObject {
         else return 0;
     }
 
+    // =========================
     // BOTTLE
+    // =========================
+
     setPercentageBottle(percentageBottle){
         this.percentageBottle = percentageBottle;
-        let index = this.resolveImageIndexBottle();
-        let path = this.IMAGES_Statusbar_Bottle[index];
+        let path = this.IMAGES_Statusbar_Bottle[this.resolveImageIndexBottle()];
         this.img = this.imageCache[path];
     }
 
@@ -82,11 +100,13 @@ class StatusBar extends DrawableObject {
         else return 0;
     }
 
+    // =========================
     // ENDBOSS
+    // =========================
+
     setPercentageEndboss(percentageEndboss){
         this.percentageEndboss = percentageEndboss;
-        let index = this.resolveImageIndexEndboss();
-        let path = this.IMAGES_Statusbar_Endboss[index];
+        let path = this.IMAGES_Statusbar_Endboss[this.resolveImageIndexEndboss()];
         this.img = this.imageCache[path];
     }
 
@@ -99,23 +119,15 @@ class StatusBar extends DrawableObject {
         else return 0;
     }
 
-    // 🔥 NEU: IF/ELSE DAMAGE LOGIK
-    reduceEndboss() {
+    // =========================
+    // ENDBOSS DAMAGE
+    // =========================
 
-        if (this.percentageEndboss == 100) {
-            this.setPercentageEndboss(80);
-        } 
-        else if (this.percentageEndboss == 80) {
-            this.setPercentageEndboss(60);
-        } 
-        else if (this.percentageEndboss == 60) {
-            this.setPercentageEndboss(40);
-        } 
-        else if (this.percentageEndboss == 40) {
-            this.setPercentageEndboss(20);
-        } 
-        else if (this.percentageEndboss == 20) {
-            this.setPercentageEndboss(0);
-        }
+    reduceEndboss() {
+        if (this.percentageEndboss == 100) this.setPercentageEndboss(80);
+        else if (this.percentageEndboss == 80) this.setPercentageEndboss(60);
+        else if (this.percentageEndboss == 60) this.setPercentageEndboss(40);
+        else if (this.percentageEndboss == 40) this.setPercentageEndboss(20);
+        else if (this.percentageEndboss == 20) this.setPercentageEndboss(0);
     }
 }

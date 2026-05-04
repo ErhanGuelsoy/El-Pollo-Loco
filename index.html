@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Pollo Loco</title>
-
     <link rel="stylesheet" href="style.css">
-
     <script src="models/drawable-object.class.js"></script>
     <script src="models/movable-object.class.js"></script>
     <script src="models/character.class.js"></script>
@@ -19,7 +17,7 @@
     <script src="models/level.class.js"></script>
     <script src="models/endboss.class.js"></script>
     <script src="models/throwable-object.class.js"></script>
-    <script src="levels/level1.js"></script>
+    <script src="levels/level1.js"></script> 
     <script src="js/game.js"></script>
 </head>
 
@@ -31,30 +29,16 @@
 
     <div class="game-area">
 
-        <!-- START SCREEN -->
         <div id="start_game" onclick="startGame()">
-            <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="start">
+            <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="start-photo"> 
         </div>
 
         <canvas id="canvas" width="720" height="480"></canvas>
 
-        <!-- =========================
-            PLAY OVERLAY
-        ========================== -->
+        <!-- PLAY OVERLAY -->
         <div id="playOverlay">
-
-            <div class="button-row">
-
-                <!-- START -->
-                <button id="startBTN" class="control-btn">▶</button>
-
-                <!-- MUSIC -->
-                <button id="soundBTN" class="control-btn">🔊</button>
-
-            </div>
-
+            <button id="startBTN" class="control-btn">▶</button>
             <span id="playLabel" class="control-label">Play</span>
-
         </div>
 
     </div>
@@ -62,6 +46,7 @@
     <!-- CONTROLS -->
     <div class="controls-bottom">
 
+        <!-- LEFT -->
         <div class="control-panel left-panel">
             <div class="arrow-group">
                 <button id="btnLeft" class="control-btn">←</button>
@@ -73,6 +58,7 @@
             </span>
         </div>
 
+        <!-- MIDDLE (THROW) -->
         <div class="control-panel center-panel">
             <div class="control-item">
                 <button id="throw" class="control-btn">↘</button>
@@ -80,6 +66,7 @@
             </div>
         </div>
 
+        <!-- RIGHT -->
         <div class="control-panel right-panel">
             <div class="control-item">
                 <button id="jumpBTN" class="control-btn">↑</button>
