@@ -1,5 +1,4 @@
 class Chicken extends MovableObject {
-
     width = 60;
     height = 60;
     y = 360;
@@ -27,38 +26,28 @@ class Chicken extends MovableObject {
     }
 
     animate() {
-
-        // 🐔 Bewegung
         setInterval(() => {
             this.moveLeft();
-
-            // ✅ FIX: NICHT spiegeln
             this.otherDirection = false;
-
         }, 1000 / 60);
 
-        // 🎞️ Animation
         setInterval(() => {
-            if (!this.isDead()) {
-                this.playAnimation(this.IMAGES_WALKING);
-            }
+            if (!this.isDead()) this.playAnimation(this.IMAGES_WALKING);
         }, 200);
     }
 
-    // 💥 Wird von Flasche getroffen
     hit() {
         this.energy = 0;
         this.die();
     }
 
-    // ☠️ Tod
     die() {
         this.loadImage(this.IMAGES_DEAD[0]);
         this.speed = 0;
 
-        // 🧹 nach 1 Sekunde entfernen
-        setTimeout(() => {
-            this.markedForDeletion = true;
-        }, 1000);
+        // Chicken-Death-Sound
+        if (gameAudio) gameAudio.play(5);
+
+        setTimeout(() => { this.markedForDeletion = true; }, 1000);
     }
 }

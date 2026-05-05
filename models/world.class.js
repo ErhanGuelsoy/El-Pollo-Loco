@@ -16,7 +16,6 @@ class World {
     throwableObjects = [];
     lastThrowTime = 0;
     endbossTriggered = false;
-
     gameEnded = false;
 
     constructor(canvas, keyboard) {
@@ -58,8 +57,10 @@ class World {
             this.checkCollisions();
             this.checkThrowObjects();
 
+            // Entferne markierte Gegner
             this.level.enemies = this.level.enemies.filter(e => !e.markedForDeletion);
 
+            // Charakterbewegung
             if (this.keyboard.RIGHT && this.character.x < this.level.level_end_x) {
                 this.character.moveRight();
             }
@@ -85,7 +86,6 @@ class World {
 
             // WIN CONDITION
             let endboss = this.level.enemies.find(e => e instanceof Endboss);
-
             if (endboss && endboss.energy <= 0 && !this.gameEnded) {
                 this.gameEnded = true;
                 this.showWinScreen();
@@ -98,7 +98,6 @@ class World {
     // THROW OBJECTS
     // =========================
     checkThrowObjects() {
-
         let now = new Date().getTime();
 
         if (this.keyboard.D && now - this.lastThrowTime > 800) {
@@ -113,16 +112,14 @@ class World {
             this.lastThrowTime = now;
 
             let bottleBar = this.statusBars[1];
-
             let newValue = bottleBar.percentageBottle - 20;
             if (newValue < 0) newValue = 0;
-
             bottleBar.setPercentageBottle(newValue);
         }
     }
 
     // =========================
-    // COLLISIONS (FIXED AUDIO)
+    // COLLISIONS
     // =========================
     checkCollisions() {
 
@@ -143,21 +140,21 @@ class World {
 
                 if (bottle.isColliding(enemy)) {
 
-                    // 🐔 END BOSS HIT + SOUND FIX
-                    if (enemy instanceof Endboss) {
+                    // Gegner trifft Flasche
+                    enemy.hit();
 
-                        enemy.hit();
-                        this.statusBars[2].reduceEndboss();
-
-                        // 🔥 AUDIO FIX HERE
-                        if (window.playEndbossSound) {
-                            playEndbossSound();
-                        }
-
-                    } else {
-                        enemy.hit();
+                    // 🔊 Chicken-Death-Sound abspielen
+                    if (enemy instanceof Chicken && enemy.isDead() && gameAudio) {
+                        gameAudio.play(5); // Chicken-Death
                     }
 
+                    // 🔥 Endboss-Treffer & Sound
+                    if (enemy instanceof Endboss && gameAudio) {
+                        this.statusBars[2].reduceEndboss();
+                        playEndbossSound();
+                    }
+
+                    // Flasche entfernen
                     this.throwableObjects.splice(index, 1);
                 }
             });
@@ -170,12 +167,10 @@ class World {
     draw() {
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
         this.ctx.translate(this.camera_x, 0);
 
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
-
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
         this.addObjectsToMap(this.throwableObjects);
@@ -197,17 +192,12 @@ class World {
     }
 
     addToMap(mo) {
-
-        if (mo.otherDirection) {
-            this.flipImage(mo);
-        }
+        if (mo.otherDirection) this.flipImage(mo);
 
         mo.draw(this.ctx);
         mo.drawFrame(this.ctx);
 
-        if (mo.otherDirection) {
-            this.flipImageBack(mo);
-        }
+        if (mo.otherDirection) this.flipImageBack(mo);
     }
 
     flipImage(mo) {
