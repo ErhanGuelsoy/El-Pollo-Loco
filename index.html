@@ -6,9 +6,8 @@
     <title>El Pollo Loco</title>
     <link rel="stylesheet" href="style.css">
 
-    <!-- JS REIHENFOLGE KORRIGIERT -->
     <script src="models/drawable-object.class.js"></script>
-    <script src="models/movable-object.class.js"></script> <!-- MUSS VOR Coins geladen werden -->
+    <script src="models/movable-object.class.js"></script> 
     <script src="models/coins.class.js"></script>
     <script src="models/character.class.js"></script>
     <script src="models/chicken.class.js"></script>
@@ -20,51 +19,44 @@
     <script src="models/level.class.js"></script>
     <script src="models/endboss.class.js"></script>
     <script src="models/throwable-object.class.js"></script>
-    <script src="levels/level1.js"></script> 
+
+    <!-- LEVEL -->
+    <script src="levels/level1.js"></script>
+
+    <!-- AUDIO -->
+    <script src="js/audio.js"></script>
+
+    <!-- GAME -->
     <script src="js/game.js"></script>
 </head>
-
 <body onload="init()">
 
 <h1>El Pollo Loco</h1>
 
 <div id="gameContainer">
-
     <div class="game-area">
-
-        <div id="start_game" onclick="startGame()">
-            <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="start-photo"> 
+        <div id="start_game">
+            <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="start-photo">
         </div>
 
         <canvas id="canvas" width="720" height="480"></canvas>
 
-        <!-- WIN SCREEN -->
         <div id="winScreen" class="end-screen hidden">
             <img src="img/You won, you lost/You Win A.png" alt="You Win">
-
             <div class="end-buttons">
                 <button class="control-btn" onclick="restartGame()">↻</button>
                 <button class="control-btn" onclick="backToMenu()">🏠</button>
             </div>
         </div>
 
-        <!-- PLAY + AUDIO OVERLAY -->
         <div id="playOverlay">
-
             <button id="startBTN" class="control-btn">▶</button>
-
-            <!-- AUDIO BUTTON -->
             <button id="audioBTN" class="control-btn">🔊</button>
-
             <span id="playLabel" class="control-label">Play</span>
-
         </div>
-
     </div>
 
-    <!-- CONTROLS -->
     <div class="controls-bottom">
-
         <div class="control-panel left-panel">
             <div class="arrow-group">
                 <button id="btnLeft" class="control-btn">←</button>
@@ -86,13 +78,8 @@
                 <span class="control-label">Arrow Up = Jump</span>
             </div>
         </div>
-
     </div>
-
 </div>
-
-<!-- JS getrennt -->
-<script src="js/audio.js"></script>
 
 </body>
 </html>
