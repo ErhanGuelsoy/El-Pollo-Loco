@@ -1,3 +1,6 @@
+// =========================
+// World.js
+// =========================
 class World {
 
     character = new Character();
@@ -26,13 +29,14 @@ class World {
 
         this.setWorld();
 
-        this.draw();
-        this.run();
+        this.draw(); // startet Zeichenloop
+        this.run();  // startet Game-Loop
     }
 
     setWorld() {
         this.character.world = this;
 
+        // Enemies der Welt zuweisen
         this.level.enemies.forEach(enemy => {
             if (enemy instanceof Endboss) {
                 enemy.world = this;
@@ -58,8 +62,10 @@ class World {
             this.checkCollisions();
             this.checkThrowObjects();
 
+            // Enemies, die markiert sind, entfernen
             this.level.enemies = this.level.enemies.filter(e => !e.markedForDeletion);
 
+            // Character Steuerung
             if (this.keyboard.RIGHT && this.character.x < this.level.level_end_x) {
                 this.character.moveRight();
             }
@@ -75,17 +81,13 @@ class World {
             // Endboss Trigger
             if (this.character.x > 2300 && !this.endbossTriggered) {
                 this.endbossTriggered = true;
-
                 this.level.enemies.forEach(enemy => {
-                    if (enemy instanceof Endboss) {
-                        enemy.hadFirstContact = true;
-                    }
+                    if (enemy instanceof Endboss) enemy.hadFirstContact = true;
                 });
             }
 
-            // WIN CONDITION
+            // Win Condition
             let endboss = this.level.enemies.find(e => e instanceof Endboss);
-
             if (endboss && endboss.energy <= 0 && !this.gameEnded) {
                 this.gameEnded = true;
                 this.showWinScreen();
@@ -98,9 +100,7 @@ class World {
     // THROW OBJECTS
     // =========================
     checkThrowObjects() {
-
         let now = new Date().getTime();
-
         if (this.keyboard.D && now - this.lastThrowTime > 800) {
 
             let bottle = new ThrowableObject(
@@ -112,52 +112,37 @@ class World {
             this.throwableObjects.push(bottle);
             this.lastThrowTime = now;
 
+            // Bottle Bar Update
             let bottleBar = this.statusBars[1];
-
             let newValue = bottleBar.percentageBottle - 20;
             if (newValue < 0) newValue = 0;
-
             bottleBar.setPercentageBottle(newValue);
         }
     }
 
     // =========================
-    // COLLISIONS (FIXED AUDIO)
+    // COLLISIONS
     // =========================
     checkCollisions() {
 
         this.level.enemies.forEach((enemy) => {
 
-            // =========================
-            // CHARACTER HIT ENEMY
-            // =========================
+            // CHARACTER HITS ENEMY
             if (this.character.isColliding(enemy) && !this.character.isHurt()) {
                 this.character.hit();
                 this.statusBars[0].setPercentage(this.character.energy);
             }
 
-            // =========================
-            // BOTTLE COLLISION
-            // =========================
+            // THROWABLE HITS ENEMY
             this.throwableObjects.forEach((bottle, index) => {
-
                 if (bottle.isColliding(enemy)) {
-
-                    // 🐔 END BOSS HIT + SOUND FIX
                     if (enemy instanceof Endboss) {
-
                         enemy.hit();
                         this.statusBars[2].reduceEndboss();
-
-                        // 🔥 AUDIO FIX HERE
-                        if (window.playEndbossSound) {
-                            playEndbossSound();
-                        }
-
+                        if (window.playEndbossSound) playEndbossSound();
                     } else {
                         enemy.hit();
                     }
-
                     this.throwableObjects.splice(index, 1);
                 }
             });
@@ -168,23 +153,24 @@ class World {
     // DRAW LOOP
     // =========================
     draw() {
-
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        // Kamera verschieben
         this.ctx.translate(this.camera_x, 0);
 
+        // Objekte zeichnen
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
-
-        this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
+        if (this.level.coins) this.addObjectsToMap(this.level.coins); // Coins hinzufügen
         this.addObjectsToMap(this.throwableObjects);
+        this.addToMap(this.character);
 
+        // Kamera zurücksetzen
         this.ctx.translate(-this.camera_x, 0);
 
-        this.statusBars.forEach(bar => {
-            this.addToMap(bar);
-        });
+        // Statusbars
+        this.statusBars.forEach(bar => this.addToMap(bar));
 
         requestAnimationFrame(() => this.draw());
     }
@@ -197,17 +183,12 @@ class World {
     }
 
     addToMap(mo) {
-
-        if (mo.otherDirection) {
-            this.flipImage(mo);
-        }
+        if (mo.otherDirection) this.flipImage(mo);
 
         mo.draw(this.ctx);
         mo.drawFrame(this.ctx);
 
-        if (mo.otherDirection) {
-            this.flipImageBack(mo);
-        }
+        if (mo.otherDirection) this.flipImageBack(mo);
     }
 
     flipImage(mo) {
@@ -220,5 +201,23 @@ class World {
     flipImageBack(mo) {
         mo.x = mo.x * -1;
         this.ctx.restore();
+    }
+}
+
+// =========================
+// init.js
+// =========================
+function init() {
+    // Level + Coins vorbereiten
+    initLevel(); 
+
+    // Canvas + Keyboard
+    const canvas = document.getElementById('canvas');
+    const keyboard = new Keyboard();
+    const world = new World(canvas, keyboard);
+
+    // Optional: Coins sicherstellen, dass Bilder geladen sind
+    if (level1.coins) {
+        level1.coins.forEach(coin => coin.loadImage("img/8_coin/coin_1.png"));
     }
 }

@@ -41,6 +41,10 @@ class Character extends MovableObject {
         "img/2_character_pepe/4_hurt/H-43.png",
     ];
 
+    IMAGES_COINS = [
+        "img/8_coin/coin_1.png" // optional, falls Character Coin-Animation haben soll
+    ];
+    
     currentImage = 0;
     world;
 
@@ -51,6 +55,7 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_JUMPING);
         this.loadImages(this.IMAGES_DEAD);
         this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_COINS);
         this.applyGravity();
         this.animate();
     }
