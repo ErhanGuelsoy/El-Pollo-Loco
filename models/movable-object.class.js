@@ -16,11 +16,8 @@ class MovableObject extends DrawableObject {
     }
 
     isAboveGround() {
-        if (this instanceof ThrowableObject) {
-            return true;
-        } else {
-            return this.y < 180;
-        }
+        if (this instanceof ThrowableObject) return true;
+        else return this.y < 180;
     }
 
     playAnimation(images) {
@@ -30,7 +27,6 @@ class MovableObject extends DrawableObject {
         this.currentImage++;
     }
 
-    // ✅ FIXED HITBOX
     isColliding(mo) {
         return  this.x < mo.x + mo.width &&
                 this.x + this.width > mo.x &&
@@ -40,18 +36,11 @@ class MovableObject extends DrawableObject {
 
     hit() {
         this.energy -= 5;
+        if (this.energy < 0) this.energy = 0;
+        else this.lastHit = new Date().getTime();
 
-        if (this.energy < 0) {
-            this.energy = 0;
-        } else {
-            this.lastHit = new Date().getTime();
-        }
-
-        if (this.otherDirection) {
-            this.x += 30;
-        } else {
-            this.x -= 30;
-        }
+        if (this.otherDirection) this.x += 30;
+        else this.x -= 30;
     }
 
     isHurt() {
@@ -63,17 +52,7 @@ class MovableObject extends DrawableObject {
         return this.energy == 0;
     }
 
-    moveRight() {
-        this.x += this.speed;
-        this.otherDirection = false;
-    }
-
-    moveLeft() {
-        this.x -= this.speed;
-        this.otherDirection = true;
-    }
-
-    jump() {
-        this.speedY = 30;
-    }
+    moveRight() { this.x += this.speed; this.otherDirection = false; }
+    moveLeft() { this.x -= this.speed; this.otherDirection = true; }
+    jump() { this.speedY = 30; }
 }

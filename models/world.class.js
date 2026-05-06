@@ -10,6 +10,7 @@ class World {
     keyboard;
     camera_x = 0;
 
+    // StatusBars: 0 = Health, 1 = Bottle, 2 = Endboss
     statusBars = [
         new StatusBar("health", 0),
         new StatusBar("bottle", 70),
@@ -60,6 +61,7 @@ class World {
             if (this.gameEnded) return;
 
             this.checkCollisions();
+            this.checkCoins();           // Coins sammeln + Health updaten
             this.checkThrowObjects();
 
             // Enemies, die markiert sind, entfernen
@@ -124,7 +126,6 @@ class World {
     // COLLISIONS
     // =========================
     checkCollisions() {
-
         this.level.enemies.forEach((enemy) => {
 
             // CHARACTER HITS ENEMY
@@ -150,6 +151,27 @@ class World {
     }
 
     // =========================
+    // COINS SAMMELN
+    // =========================
+    checkCoins() {
+        this.level.coins.forEach((coin, index) => {
+            if (this.character.isColliding(coin)) {
+                // Coin entfernen
+                this.level.coins.splice(index, 1);
+
+                // Health-Bar auffüllen, max 100
+                let healthBar = this.statusBars[0];
+                let newHealth = healthBar.percentage + 20;
+                if (newHealth > 100) newHealth = 100;
+                healthBar.setPercentage(newHealth);
+
+                // Charakter Energie ebenfalls updaten
+                this.character.energy = newHealth;
+            }
+        });
+    }
+
+    // =========================
     // DRAW LOOP
     // =========================
     draw() {
@@ -162,7 +184,7 @@ class World {
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
         this.addObjectsToMap(this.level.enemies);
-        if (this.level.coins) this.addObjectsToMap(this.level.coins); // Coins hinzufügen
+        if (this.level.coins) this.addObjectsToMap(this.level.coins);
         this.addObjectsToMap(this.throwableObjects);
         this.addToMap(this.character);
 
@@ -201,23 +223,5 @@ class World {
     flipImageBack(mo) {
         mo.x = mo.x * -1;
         this.ctx.restore();
-    }
-}
-
-// =========================
-// init.js
-// =========================
-function init() {
-    // Level + Coins vorbereiten
-    initLevel(); 
-
-    // Canvas + Keyboard
-    const canvas = document.getElementById('canvas');
-    const keyboard = new Keyboard();
-    const world = new World(canvas, keyboard);
-
-    // Optional: Coins sicherstellen, dass Bilder geladen sind
-    if (level1.coins) {
-        level1.coins.forEach(coin => coin.loadImage("img/8_coin/coin_1.png"));
     }
 }

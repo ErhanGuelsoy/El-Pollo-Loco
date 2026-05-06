@@ -35,12 +35,9 @@ class StatusBar extends DrawableObject {
 
     constructor(type = "health", y = 0) {
         super();
-
         this.type = type;
 
-        // 🔥 FIX: näher an linken Rand
         this.x = 10;
-
         this.y = y;
         this.width = 250;
         this.height = 80;
@@ -49,23 +46,14 @@ class StatusBar extends DrawableObject {
         this.loadImages(this.IMAGES_Statusbar_Bottle);
         this.loadImages(this.IMAGES_Statusbar_Endboss);
 
-        if (this.type === "health") {
-            this.setPercentage(100);
-        }
-
-        if (this.type === "bottle") {
-            this.setPercentageBottle(100);
-        }
-
-        if (this.type === "endboss") {
-            this.setPercentageEndboss(100);
-        }
+        if (this.type === "health") this.setPercentage(100);
+        if (this.type === "bottle") this.setPercentageBottle(100);
+        if (this.type === "endboss") this.setPercentageEndboss(100);
     }
 
     // =========================
     // HEALTH
     // =========================
-
     setPercentage(percentage) {
         this.percentage = percentage;
         let path = this.IMAGES[this.resolveImageIndex()];
@@ -84,7 +72,6 @@ class StatusBar extends DrawableObject {
     // =========================
     // BOTTLE
     // =========================
-
     setPercentageBottle(percentageBottle){
         this.percentageBottle = percentageBottle;
         let path = this.IMAGES_Statusbar_Bottle[this.resolveImageIndexBottle()];
@@ -103,7 +90,6 @@ class StatusBar extends DrawableObject {
     // =========================
     // ENDBOSS
     // =========================
-
     setPercentageEndboss(percentageEndboss){
         this.percentageEndboss = percentageEndboss;
         let path = this.IMAGES_Statusbar_Endboss[this.resolveImageIndexEndboss()];
@@ -122,7 +108,6 @@ class StatusBar extends DrawableObject {
     // =========================
     // ENDBOSS DAMAGE
     // =========================
-
     reduceEndboss() {
         if (this.percentageEndboss == 100) this.setPercentageEndboss(80);
         else if (this.percentageEndboss == 80) this.setPercentageEndboss(60);

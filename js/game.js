@@ -1,14 +1,18 @@
 // =========================
-// GAME AUDIO
+// game.js
+// =========================
+
+// =========================
+// AUDIO
 // =========================
 class GameAudio {
     AUDIO_FILES = [
-        "audio/dragon-studio-car-crash-sound-376882.mp3",        // 0 Crash
-        "audio/freesound_community-cartoon-jump-6462.mp3",       // 1 Jump
-        "audio/liecio-collect-points-190037.mp3",                // 2 Collect
-        "audio/spinopel-run-on-asphalt-road-393093.mp3",         // 3 Run Loop
-        "audio/freesound_community-chicken-single-alarm-call-6056.mp3", // 4 Endboss
-        "audio/digitalstore07-chicken-430403.mp3"                // 5 Chicken Tod
+        "audio/dragon-studio-car-crash-sound-376882.mp3",
+        "audio/freesound_community-cartoon-jump-6462.mp3",
+        "audio/liecio-collect-points-190037.mp3",
+        "audio/spinopel-run-on-asphalt-road-393093.mp3",
+        "audio/freesound_community-chicken-single-alarm-call-6056.mp3",
+        "audio/digitalstore07-chicken-430403.mp3"
     ];
 
     constructor() {
@@ -21,8 +25,7 @@ class GameAudio {
             let audio = new Audio(path);
             audio.preload = "auto";
 
-            // Run Loop
-            if (i === 3) {
+            if (i === 3) { // Lauf-Sound
                 audio.loop = true;
                 audio.volume = 0.4;
             }
@@ -136,21 +139,28 @@ function playEndbossSound() {
 // KEYBOARD EVENTS
 // =========================
 window.addEventListener('keydown', (e) => {
-    if(e.keyCode==39) keyboard.RIGHT=true;
-    if(e.keyCode==37) keyboard.LEFT=true;
-    if(e.keyCode==38) keyboard.UP=true;
-    if(e.keyCode==40) keyboard.DOWN=true;
-    if(e.keyCode==32) { keyboard.SPACE=true; triggerJump(); }
-    if(e.keyCode==68) keyboard.D=true;
+    if(e.keyCode == 39) keyboard.RIGHT = true;
+    if(e.keyCode == 37) keyboard.LEFT = true;
+    if(e.keyCode == 38) keyboard.UP = true;
+    if(e.keyCode == 40) keyboard.DOWN = true;
+    if(e.keyCode == 32) { 
+        keyboard.SPACE = true;
+        keyboard.UP = true; // Leertaste = Jump
+        triggerJump(); 
+    }
+    if(e.keyCode == 68) keyboard.D = true;
 });
 
 window.addEventListener('keyup', (e) => {
-    if(e.keyCode==39) keyboard.RIGHT=false;
-    if(e.keyCode==37) keyboard.LEFT=false;
-    if(e.keyCode==38) keyboard.UP=false;
-    if(e.keyCode==40) keyboard.DOWN=false;
-    if(e.keyCode==32) keyboard.SPACE=false;
-    if(e.keyCode==68) keyboard.D=false;
+    if(e.keyCode == 39) keyboard.RIGHT = false;
+    if(e.keyCode == 37) keyboard.LEFT = false;
+    if(e.keyCode == 38) keyboard.UP = false;
+    if(e.keyCode == 40) keyboard.DOWN = false;
+    if(e.keyCode == 32) { 
+        keyboard.SPACE = false;
+        keyboard.UP = false; // Leertaste loslassen
+    }
+    if(e.keyCode == 68) keyboard.D = false;
 });
 
 // =========================
@@ -163,7 +173,10 @@ function bindControlButtons() {
     document.getElementById('btnRight').addEventListener('pointerdown', ()=>keyboard.RIGHT=true);
     document.getElementById('btnRight').addEventListener('pointerup', ()=>keyboard.RIGHT=false);
 
-    document.getElementById('jumpBTN').addEventListener('pointerdown', ()=>{ keyboard.UP=true; triggerJump(); });
+    document.getElementById('jumpBTN').addEventListener('pointerdown', ()=>{ 
+        keyboard.UP=true; 
+        triggerJump(); 
+    });
     document.getElementById('jumpBTN').addEventListener('pointerup', ()=>keyboard.UP=false);
 
     document.getElementById('throw').addEventListener('pointerdown', ()=>keyboard.D=true);
