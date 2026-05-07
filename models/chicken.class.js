@@ -1,9 +1,9 @@
 class Chicken extends MovableObject {
+
     width = 60;
     height = 60;
     y = 360;
 
-    // Animationen
     IMAGES_WALKING = [
         "img/3_enemies_chicken/chicken_normal/1_walk/1_w.png",
         "img/3_enemies_chicken/chicken_normal/1_walk/2_w.png",
@@ -14,55 +14,80 @@ class Chicken extends MovableObject {
         "img/3_enemies_chicken/chicken_normal/2_dead/dead.png"
     ];
 
-    // 🔊 Sound-Index für GameAudio (Auto-Crash)
     deathSoundIndex = 0;
 
-    constructor() {
+    constructor(x = 400 + Math.random() * 1600) {
         super();
+
         this.loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_DEAD);
 
-        this.x = 300 + Math.random() * 1000; // zufällige Startposition
-        this.speed = 0.5 + Math.random();    // zufällige Geschwindigkeit
+        // =========================
+        // FRÜHERE SPAWN-ZONE + MEHR RANDOM
+        // =========================
+        let minX = 400;   // früher als vorher
+        let maxX = 2400;  // weiter weg vom Endboss
+
+        this.x = x;
+
+        if (!x) {
+            this.x = minX + Math.random() * (maxX - minX);
+        }
+
+        this.speed = 0.5 + Math.random();
+
+        this.canMove = false;
+        this.startDelay = 200 + Math.random() * 1000;
+
+        setTimeout(() => {
+            this.canMove = true;
+        }, this.startDelay);
 
         this.animate();
     }
 
     animate() {
-        // Bewegung nach links
+
         setInterval(() => {
+
+            if (!this.canMove) return;
+            if (this.isDead()) return;
+
+            this.speed = 0.4 + Math.random() * 0.7;
             this.moveLeft();
             this.otherDirection = false;
+
         }, 1000 / 60);
 
-        // Animationswechsel
         setInterval(() => {
-            if (!this.isDead()) this.playAnimation(this.IMAGES_WALKING);
+
+            if (!this.canMove) return;
+            if (this.isDead()) return;
+
+            this.playAnimation(this.IMAGES_WALKING);
+
         }, 200);
     }
 
-    // Trefferfunktion
     hit() {
         this.energy = 0;
         this.die();
     }
 
-    // Tod
     die() {
         this.loadImage(this.IMAGES_DEAD[0]);
         this.speed = 0;
 
-        // 🔊 Auto-Crash Sound abspielen
-        if (gameAudio) gameAudio.play(this.deathSoundIndex);
+        if (window.gameAudio) {
+            gameAudio.play(this.deathSoundIndex);
+        }
 
-        // Chicken nach 1 Sekunde löschen
         setTimeout(() => {
             this.markedForDeletion = true;
         }, 1000);
     }
 
-    // Prüfen ob Chicken tot ist
     isDead() {
         return this.energy <= 0;
     }

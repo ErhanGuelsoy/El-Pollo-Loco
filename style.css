@@ -62,7 +62,6 @@ canvas {
     top: 20px;
     left: 20px;
     z-index: 20;
-
     display: flex;
     align-items: center;
     gap: 10px;
@@ -81,6 +80,10 @@ canvas {
     justify-content: space-between;
     width: 100%;
     max-width: 720px;
+
+    /* NUR RECHTE SEITE LEICHT VERSCHIEBEN */
+    padding-right: 15px;
+    box-sizing: border-box;
 }
 
 .left-panel,
@@ -91,6 +94,20 @@ canvas {
     flex-direction: column;
 }
 
+.left-panel {
+    align-items: flex-start;
+}
+
+.center-panel {
+    align-items: center;
+}
+
+.right-panel {
+    align-items: flex-end;
+    margin-right: -10px; /* 🔥 nur rechts leicht nach außen */
+}
+
+/* ARROWS */
 .arrow-group {
     display: flex;
     gap: 10px;

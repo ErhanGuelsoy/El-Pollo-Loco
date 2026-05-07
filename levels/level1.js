@@ -2,11 +2,13 @@ function initLevel() {
     level1 = new Level(
         // Enemies
         [
-            new Chicken(),
-            new Chicken(),
-            new Chicken(),
-            new Chicken(),
-            new Chicken(),
+            new Chicken(600),
+            new Chicken(1100),
+            new Chicken(1700),
+            new Chicken(2400),
+            new Chicken(3200),
+            new Chicken(4100),
+            new Chicken(5000),
             new Endboss()
         ],
 
@@ -32,15 +34,15 @@ function initLevel() {
             new BackgroundObject('img/5_background/layers/2_second_layer/2.png', 719),
             new BackgroundObject('img/5_background/layers/1_first_layer/2.png', 719),
 
-            new BackgroundObject('img/5_background/layers/air.png', 719*2),
-            new BackgroundObject('img/5_background/layers/3_third_layer/1.png', 719*2),
-            new BackgroundObject('img/5_background/layers/2_second_layer/1.png', 719*2),
-            new BackgroundObject('img/5_background/layers/1_first_layer/1.png', 719*2),
+            new BackgroundObject('img/5_background/layers/air.png', 719 * 2),
+            new BackgroundObject('img/5_background/layers/3_third_layer/1.png', 719 * 2),
+            new BackgroundObject('img/5_background/layers/2_second_layer/1.png', 719 * 2),
+            new BackgroundObject('img/5_background/layers/1_first_layer/1.png', 719 * 2),
 
-            new BackgroundObject('img/5_background/layers/air.png', 719*3),
-            new BackgroundObject('img/5_background/layers/3_third_layer/2.png', 719*3),
-            new BackgroundObject('img/5_background/layers/2_second_layer/2.png', 719*3),
-            new BackgroundObject('img/5_background/layers/1_first_layer/2.png', 719*3)
+            new BackgroundObject('img/5_background/layers/air.png', 719 * 3),
+            new BackgroundObject('img/5_background/layers/3_third_layer/2.png', 719 * 3),
+            new BackgroundObject('img/5_background/layers/2_second_layer/2.png', 719 * 3),
+            new BackgroundObject('img/5_background/layers/1_first_layer/2.png', 719 * 3)
         ],
 
         // Coins

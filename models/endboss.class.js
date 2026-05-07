@@ -19,17 +19,18 @@ class Endboss extends MovableObject {
     IMAGES_ENDBOSS_DAMAGE = [
         "img/4_enemie_boss_chicken/4_hurt/G21.png",
         "img/4_enemie_boss_chicken/4_hurt/G22.png",
-        "img/4_enemie_boss_chicken/4_hurt/G23.png",
+        "img/4_enemie_boss_chicken/4_hurt/G23.png"
     ];
 
     IMAGES_ENDBOSS_DEATH = [
         "img/4_enemie_boss_chicken/5_dead/G24.png",
         "img/4_enemie_boss_chicken/5_dead/G25.png",
-        "img/4_enemie_boss_chicken/5_dead/G26.png",
+        "img/4_enemie_boss_chicken/5_dead/G26.png"
     ];
 
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
+
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_ENDBOSS_DAMAGE);
         this.loadImages(this.IMAGES_ENDBOSS_DEATH);
@@ -39,6 +40,7 @@ class Endboss extends MovableObject {
     }
 
     animate() {
+
         setInterval(() => {
 
             if (this.isDead()) {
@@ -54,7 +56,6 @@ class Endboss extends MovableObject {
         }, 150);
     }
 
-    // 🔥 20 DAMAGE
     hit() {
         this.energy -= 20;
 
@@ -62,6 +63,13 @@ class Endboss extends MovableObject {
             this.energy = 0;
         } else {
             this.lastHit = new Date().getTime();
+        }
+
+        // =========================
+        // 🔊 ENDBOSS SOUND FIX
+        // =========================
+        if (window.gameAudio) {
+            window.gameAudio.play(4);
         }
     }
 }
