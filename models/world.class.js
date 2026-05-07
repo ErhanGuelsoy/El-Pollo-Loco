@@ -20,7 +20,6 @@ class World {
     throwableObjects = [];
     lastThrowTime = 0;
     endbossTriggered = false;
-
     gameEnded = false;
 
     constructor(canvas, keyboard) {
@@ -53,6 +52,13 @@ class World {
     }
 
     // =========================
+    // LOSE SCREEN
+    // =========================
+    showLoseScreen() {
+        document.getElementById('loseScreen').classList.remove('hidden');
+    }
+
+    // =========================
     // GAME LOOP
     // =========================
     run() {
@@ -61,10 +67,10 @@ class World {
             if (this.gameEnded) return;
 
             this.checkCollisions();
-            this.checkCoins();           // Coins sammeln + Health updaten
+            this.checkCoins();
             this.checkThrowObjects();
 
-            // Enemies, die markiert sind, entfernen
+            // Enemies entfernen
             this.level.enemies = this.level.enemies.filter(e => !e.markedForDeletion);
 
             // Character Steuerung
@@ -80,19 +86,37 @@ class World {
                 this.character.jump();
             }
 
-            // Endboss Trigger
+            // =========================
+            // ENDBOSS TRIGGER
+            // =========================
             if (this.character.x > 2300 && !this.endbossTriggered) {
                 this.endbossTriggered = true;
+
                 this.level.enemies.forEach(enemy => {
-                    if (enemy instanceof Endboss) enemy.hadFirstContact = true;
+                    if (enemy instanceof Endboss) {
+                        enemy.hadFirstContact = true;
+                    }
                 });
             }
 
-            // Win Condition
-            let endboss = this.level.enemies.find(e => e instanceof Endboss);
+            // =========================
+            // WIN CONDITION
+            // =========================
+            let endboss = this.level.enemies.find(
+                e => e instanceof Endboss
+            );
+
             if (endboss && endboss.energy <= 0 && !this.gameEnded) {
                 this.gameEnded = true;
                 this.showWinScreen();
+            }
+
+            // =========================
+            // LOSE CONDITION
+            // =========================
+            if (this.character.energy <= 0 && !this.gameEnded) {
+                this.gameEnded = true;
+                this.showLoseScreen();
             }
 
         }, 1000 / 60);
@@ -103,6 +127,7 @@ class World {
     // =========================
     checkThrowObjects() {
         let now = new Date().getTime();
+
         if (this.keyboard.D && now - this.lastThrowTime > 800) {
 
             let bottle = new ThrowableObject(
@@ -116,8 +141,13 @@ class World {
 
             // Bottle Bar Update
             let bottleBar = this.statusBars[1];
+
             let newValue = bottleBar.percentageBottle - 20;
-            if (newValue < 0) newValue = 0;
+
+            if (newValue < 0) {
+                newValue = 0;
+            }
+
             bottleBar.setPercentageBottle(newValue);
         }
     }
@@ -126,24 +156,49 @@ class World {
     // COLLISIONS
     // =========================
     checkCollisions() {
+
         this.level.enemies.forEach((enemy) => {
 
+            // =========================
             // CHARACTER HITS ENEMY
-            if (this.character.isColliding(enemy) && !this.character.isHurt()) {
+            // =========================
+            if (
+                this.character.isColliding(enemy) &&
+                !this.character.isHurt()
+            ) {
+
                 this.character.hit();
-                this.statusBars[0].setPercentage(this.character.energy);
+
+                this.statusBars[0].setPercentage(
+                    this.character.energy
+                );
             }
 
+            // =========================
             // THROWABLE HITS ENEMY
+            // =========================
             this.throwableObjects.forEach((bottle, index) => {
+
                 if (bottle.isColliding(enemy)) {
+
+                    // ENDBOSS
                     if (enemy instanceof Endboss) {
+
                         enemy.hit();
+
                         this.statusBars[2].reduceEndboss();
-                        if (window.playEndbossSound) playEndbossSound();
+
+                        if (window.playEndbossSound) {
+                            playEndbossSound();
+                        }
+
                     } else {
+
+                        // NORMALE ENEMIES
                         enemy.hit();
                     }
+
+                    // Bottle entfernen
                     this.throwableObjects.splice(index, 1);
                 }
             });
@@ -151,22 +206,46 @@ class World {
     }
 
     // =========================
-    // COINS SAMMELN
+    // COINS SAMMELN + AUDIO
     // =========================
     checkCoins() {
+
         this.level.coins.forEach((coin, index) => {
+
             if (this.character.isColliding(coin)) {
+
                 // Coin entfernen
                 this.level.coins.splice(index, 1);
 
-                // Health-Bar auffüllen, max 100
+                // =========================
+                // HEALTHBAR AUFFÜLLEN
+                // =========================
                 let healthBar = this.statusBars[0];
+
                 let newHealth = healthBar.percentage + 20;
-                if (newHealth > 100) newHealth = 100;
+
+                if (newHealth > 100) {
+                    newHealth = 100;
+                }
+
                 healthBar.setPercentage(newHealth);
 
-                // Charakter Energie ebenfalls updaten
+                // Charakter Energie updaten
                 this.character.energy = newHealth;
+
+                // =========================
+                // COIN SOUND
+                // =========================
+                if (window.gameAudio && window.canPlayCoinSound) {
+
+                    gameAudio.play(6);
+
+                    window.canPlayCoinSound = false;
+
+                    setTimeout(() => {
+                        window.canPlayCoinSound = true;
+                    }, 200);
+                }
             }
         });
     }
@@ -175,7 +254,13 @@ class World {
     // DRAW LOOP
     // =========================
     draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.ctx.clearRect(
+            0,
+            0,
+            this.canvas.width,
+            this.canvas.height
+        );
 
         // Kamera verschieben
         this.ctx.translate(this.camera_x, 0);
@@ -184,15 +269,22 @@ class World {
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
         this.addObjectsToMap(this.level.enemies);
-        if (this.level.coins) this.addObjectsToMap(this.level.coins);
+
+        if (this.level.coins) {
+            this.addObjectsToMap(this.level.coins);
+        }
+
         this.addObjectsToMap(this.throwableObjects);
+
         this.addToMap(this.character);
 
         // Kamera zurücksetzen
         this.ctx.translate(-this.camera_x, 0);
 
-        // Statusbars
-        this.statusBars.forEach(bar => this.addToMap(bar));
+        // Statusbars zeichnen
+        this.statusBars.forEach(bar => {
+            this.addToMap(bar);
+        });
 
         requestAnimationFrame(() => this.draw());
     }
@@ -201,27 +293,40 @@ class World {
     // HELPERS
     // =========================
     addObjectsToMap(objects) {
-        objects.forEach(o => this.addToMap(o));
+        objects.forEach(o => {
+            this.addToMap(o);
+        });
     }
 
     addToMap(mo) {
-        if (mo.otherDirection) this.flipImage(mo);
+
+        if (mo.otherDirection) {
+            this.flipImage(mo);
+        }
 
         mo.draw(this.ctx);
         mo.drawFrame(this.ctx);
 
-        if (mo.otherDirection) this.flipImageBack(mo);
+        if (mo.otherDirection) {
+            this.flipImageBack(mo);
+        }
     }
 
     flipImage(mo) {
+
         this.ctx.save();
+
         this.ctx.translate(mo.width, 0);
+
         this.ctx.scale(-1, 1);
+
         mo.x = mo.x * -1;
     }
 
     flipImageBack(mo) {
+
         mo.x = mo.x * -1;
+
         this.ctx.restore();
     }
 }

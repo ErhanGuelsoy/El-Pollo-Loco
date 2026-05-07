@@ -67,6 +67,16 @@ canvas {
     align-items: center;
 }
 
+#playOverlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 /* CONTROLS */
 .controls-bottom {
     display: flex;
@@ -115,7 +125,7 @@ canvas {
     cursor: pointer;
 }
 
-/* WIN SCREEN */
+/* WIN + LOSE SCREEN */
 .end-screen {
     position: absolute;
     width: 100%;
@@ -137,6 +147,7 @@ canvas {
     object-fit: cover;
 }
 
+/* END BUTTONS */
 .end-buttons {
     position: absolute;
     bottom: 30px;
@@ -144,18 +155,9 @@ canvas {
     gap: 20px;
 }
 
+/* HIDDEN */
 .hidden {
     display: none;
-}
-
-#playOverlay {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
 /* FONT */

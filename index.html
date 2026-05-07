@@ -29,56 +29,86 @@
     <!-- GAME -->
     <script src="js/game.js"></script>
 </head>
+
 <body onload="init()">
 
 <h1>El Pollo Loco</h1>
 
 <div id="gameContainer">
+
     <div class="game-area">
+
         <div id="start_game">
             <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="start-photo">
         </div>
 
         <canvas id="canvas" width="720" height="480"></canvas>
 
+        <!-- WIN SCREEN -->
         <div id="winScreen" class="end-screen hidden">
             <img src="img/You won, you lost/You Win A.png" alt="You Win">
+
             <div class="end-buttons">
                 <button class="control-btn" onclick="restartGame()">↻</button>
                 <button class="control-btn" onclick="backToMenu()">🏠</button>
             </div>
         </div>
 
+        <!-- LOSE SCREEN -->
+        <div id="loseScreen" class="end-screen hidden">
+            <img src="img/You won, you lost/You lost.png" alt="You Lost">
+
+            <div class="end-buttons">
+                <button class="control-btn" onclick="restartGame()">↻</button>
+                <button class="control-btn" onclick="backToMenu()">🏠</button>
+            </div>
+        </div>
+
+        <!-- PLAY OVERLAY -->
         <div id="playOverlay">
             <button id="startBTN" class="control-btn">▶</button>
             <button id="audioBTN" class="control-btn">🔊</button>
             <span id="playLabel" class="control-label">Play</span>
         </div>
+
     </div>
 
+    <!-- CONTROLS -->
     <div class="controls-bottom">
+
         <div class="control-panel left-panel">
             <div class="arrow-group">
                 <button id="btnLeft" class="control-btn">←</button>
                 <button id="btnRight" class="control-btn">→</button>
             </div>
-            <span class="control-label-wide">Arrow left / right = Move</span>
+
+            <span class="control-label-wide">
+                Arrow left / right = Move
+            </span>
         </div>
 
         <div class="control-panel center-panel">
             <div class="control-item">
                 <button id="throw" class="control-btn">↘</button>
-                <span class="control-label">Spacebar = Throw Tobasco</span>
+
+                <span class="control-label">
+                    Spacebar = Throw Tobasco
+                </span>
             </div>
         </div>
 
         <div class="control-panel right-panel">
             <div class="control-item">
                 <button id="jumpBTN" class="control-btn">↑</button>
-                <span class="control-label">Arrow Up = Jump</span>
+
+                <span class="control-label">
+                    Arrow Up = Jump
+                </span>
             </div>
         </div>
+
     </div>
+
 </div>
 
 </body>

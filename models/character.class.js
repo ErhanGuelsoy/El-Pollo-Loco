@@ -43,6 +43,10 @@ class Character extends MovableObject {
         "img/2_character_pepe/4_hurt/H-43.png"
     ];
 
+    IMAGE_LOST_GAME = [
+        "img/You won, you lost/You lost.png"
+    ]
+
     currentImage = 0;
     world;
 
@@ -61,7 +65,7 @@ class Character extends MovableObject {
     // ANIMATIONEN & BEWEGUNG
     // =========================
     animate() {
-        // Movement & Kamera
+        // Bewegung und Kamera
         setInterval(() => {
             if (!this.world) return;
 
@@ -77,9 +81,7 @@ class Character extends MovableObject {
                 this.jump();
             }
 
-            // Kamera auf Character zentrieren
             this.world.camera_x = -this.x + this.world.canvas.width / 4;
-
         }, 1000 / 60);
 
         // Animationsbilder
@@ -97,4 +99,32 @@ class Character extends MovableObject {
             }
         }, 100);
     }
+
+    // =========================
+    // COLLISIONS & SCHADEN
+    // =========================
+    hit() {
+        this.energy -= 5;
+        if (this.energy < 0) this.energy = 0;
+        else this.lastHit = new Date().getTime();
+
+        if (this.otherDirection) this.x += 30;
+        else this.x -= 30;
+    }
+
+    isHurt() {
+        let timepassed = (new Date().getTime() - this.lastHit) / 1000;
+        return timepassed < 1;
+    }
+
+    isDead() {
+        return this.energy <= 0;
+    }
+
+    // =========================
+    // BEWEGUNG
+    // =========================
+    moveRight() { this.x += this.speed; this.otherDirection = false; }
+    moveLeft() { this.x -= this.speed; this.otherDirection = true; }
+    jump() { this.speedY = 30; }
 }

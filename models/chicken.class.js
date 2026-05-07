@@ -60,10 +60,6 @@ class Chicken extends MovableObject {
         setTimeout(() => {
             this.markedForDeletion = true;
         }, 1000);
-        // Chicken-Death-Sound
-        if (gameAudio) gameAudio.play(5);
-
-        setTimeout(() => { this.markedForDeletion = true; }, 1000);
     }
 
     // Prüfen ob Chicken tot ist
