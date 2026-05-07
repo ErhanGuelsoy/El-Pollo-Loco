@@ -17,7 +17,7 @@ class GameAudio {
     }
 
     loadSounds() {
-        this.AUDIO_FILES.forEach((path) => {
+        this.AUDIO_FILES.forEach(path => {
             const audio = new Audio(path);
             audio.preload = "auto";
             this.sounds.push(audio);
@@ -26,18 +26,17 @@ class GameAudio {
 
     play(index) {
         if (!this.sounds[index]) return;
-
         this.sounds[index].currentTime = 0;
         this.sounds[index].play().catch(() => {});
     }
 
     muteAll(muted) {
-        this.sounds.forEach(sound => sound.muted = muted);
+        this.sounds.forEach(s => s.muted = muted);
     }
 }
 
 // =========================
-// GLOBAL VARIABLES
+// GLOBAL STATE
 // =========================
 let keyboard = new Keyboard();
 let canvas, world, gameAudio;
@@ -60,11 +59,7 @@ function init() {
 
     audioBTN.addEventListener("click", () => {
         isMuted = !isMuted;
-
-        if (gameAudio) {
-            gameAudio.muteAll(isMuted);
-        }
-
+        if (gameAudio) gameAudio.muteAll(isMuted);
         audioBTN.innerText = isMuted ? "🔇" : "🔊";
     });
 }
@@ -85,73 +80,84 @@ function startGame() {
     gameAudio = new GameAudio();
     window.gameAudio = gameAudio;
 
-    // =========================
-    // 🎵 BACKGROUND MUSIC FIX
-    // =========================
+    // 🎵 BACKGROUND MUSIC
     const bgMusic = gameAudio.sounds[7];
-
     bgMusic.loop = true;
     bgMusic.volume = 0.4;
     bgMusic.currentTime = 0;
-
-    const playPromise = bgMusic.play();
-
-    if (playPromise !== undefined) {
-        playPromise.catch(err => {
-            console.log("Audio blocked:", err);
-        });
-    }
+    bgMusic.play().catch(() => {});
 
     bindControlButtons();
 }
 
 // =========================
-// SOUND HELPERS
+// 🔥 FIXED RESTART (NO RELOAD)
+// =========================
+
+function restartGame() {
+
+    // Stop old game
+    if (world) {
+        world.gameEnded = true;
+        world = null;
+    }
+
+    // Stop audio
+    if (gameAudio) {
+        gameAudio.sounds.forEach(s => {
+            s.pause();
+            s.currentTime = 0;
+        });
+    }
+
+    // Reset keyboard
+    keyboard = new Keyboard();
+
+    // Clear canvas
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Hide win screen
+    document.getElementById('winScreen').classList.add('hidden');
+
+    // Restart level + world
+    initLevel();
+    world = new World(canvas, keyboard);
+
+    gameAudio = new GameAudio();
+    window.gameAudio = gameAudio;
+
+    const bgMusic = gameAudio.sounds[7];
+    bgMusic.loop = true;
+    bgMusic.volume = 0.4;
+    bgMusic.play().catch(() => {});
+}
+
+// =========================
+// SOUND
 // =========================
 function triggerJump() {
     if (!gameAudio || !canJumpSound) return;
-
     gameAudio.play(1);
 
     canJumpSound = false;
     setTimeout(() => canJumpSound = true, 300);
 }
 
-function handleRunSound() {
-    if (!gameAudio) return;
-
-    const moving = keyboard.LEFT || keyboard.RIGHT;
-
-    if (moving && !isRunning) {
-        gameAudio.sounds[3].play().catch(() => {});
-        isRunning = true;
-    }
-
-    if (!moving && isRunning) {
-        gameAudio.sounds[3].pause();
-        gameAudio.sounds[3].currentTime = 0;
-        isRunning = false;
-    }
-}
-
 function playEndbossSound() {
-    if (gameAudio) {
-        gameAudio.play(4);
-    }
+    if (gameAudio) gameAudio.play(4);
 }
 
 function playCoinSound() {
     if (!gameAudio || !canPlayCoinSound) return;
-
-    gameAudio.play(6);
+    gameAudio.play(2);
 
     canPlayCoinSound = false;
-
     setTimeout(() => canPlayCoinSound = true, 200);
 }
 
 // =========================
-// KEY CONTROLS
+// CONTROLS
 // =========================
 window.addEventListener('keydown', e => {
 
@@ -185,7 +191,7 @@ window.addEventListener('keyup', e => {
 });
 
 // =========================
-// TOUCH CONTROLS
+// TOUCH BUTTONS
 // =========================
 function bindControlButtons() {
 
@@ -207,12 +213,8 @@ function bindControlButtons() {
 }
 
 // =========================
-// UI ACTIONS
+// MENU ACTIONS
 // =========================
-function restartGame() {
-    location.reload();
-}
-
 function backToMenu() {
     location.href = "index.html";
 }

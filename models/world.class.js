@@ -29,33 +29,21 @@ class World {
         this.run();
     }
 
-    // =========================
-    // CHICKEN DELAY START
-    // =========================
     setWorld() {
         this.character.world = this;
 
         this.level.enemies.forEach(enemy => {
-
             if (enemy instanceof Endboss) {
                 enemy.world = this;
-            }
-
-            if (enemy instanceof Chicken) {
-                enemy.active = false;
-
-                setTimeout(() => {
-                    enemy.active = true;
-                }, 1000 + Math.random() * 3000);
             }
         });
     }
 
-    // =========================
-    // GAME LOOP
-    // =========================
-    run() {
+    showWinScreen() {
+        document.getElementById('winScreen').classList.remove('hidden');
+    }
 
+    run() {
         setInterval(() => {
 
             if (this.gameEnded) return;
@@ -64,9 +52,7 @@ class World {
             this.checkCoins();
             this.checkThrowObjects();
 
-            this.level.enemies = this.level.enemies.filter(
-                e => !e.markedForDeletion
-            );
+            this.level.enemies = this.level.enemies.filter(e => !e.markedForDeletion);
 
             if (this.keyboard.RIGHT && this.character.x < this.level.level_end_x) {
                 this.character.moveRight();
@@ -80,36 +66,24 @@ class World {
                 this.character.jump();
             }
 
-            // ENDBOSS TRIGGER
-            if (this.character.x > 2000 && !this.endbossTriggered) {
+            if (this.character.x > 2300 && !this.endbossTriggered) {
                 this.endbossTriggered = true;
+                this.level.enemies.forEach(enemy => {
+                    if (enemy instanceof Endboss) enemy.hadFirstContact = true;
+                });
             }
 
-            // WIN
             let endboss = this.level.enemies.find(e => e instanceof Endboss);
-            if (endboss && endboss.energy <= 0) {
+            if (endboss && endboss.energy <= 0 && !this.gameEnded) {
                 this.gameEnded = true;
-                document.getElementById('winScreen').classList.remove('hidden');
-                return;
-            }
-
-            // LOSE
-            if (this.character.energy <= 0) {
-                this.gameEnded = true;
-                document.getElementById('loseScreen').classList.remove('hidden');
-                return;
+                this.showWinScreen();
             }
 
         }, 1000 / 60);
     }
 
-    // =========================
-    // THROW OBJECTS
-    // =========================
     checkThrowObjects() {
-
         let now = new Date().getTime();
-
         if (this.keyboard.D && now - this.lastThrowTime > 800) {
 
             let bottle = new ThrowableObject(
@@ -119,24 +93,16 @@ class World {
             );
 
             this.throwableObjects.push(bottle);
-
             this.lastThrowTime = now;
 
             let bottleBar = this.statusBars[1];
-
             let newValue = bottleBar.percentageBottle - 20;
-
             if (newValue < 0) newValue = 0;
-
             bottleBar.setPercentageBottle(newValue);
         }
     }
 
-    // =========================
-    // COLLISIONS
-    // =========================
     checkCollisions() {
-
         this.level.enemies.forEach((enemy) => {
 
             if (this.character.isColliding(enemy) && !this.character.isHurt()) {
@@ -145,13 +111,17 @@ class World {
             }
 
             this.throwableObjects.forEach((bottle, index) => {
-
                 if (bottle.isColliding(enemy)) {
-
-                    enemy.hit();
-
                     if (enemy instanceof Endboss) {
+                        enemy.hit();
                         this.statusBars[2].reduceEndboss();
+
+                        if (window.gameAudio) {
+                            window.gameAudio.play(4);
+                        }
+
+                    } else {
+                        enemy.hit();
                     }
 
                     this.throwableObjects.splice(index, 1);
@@ -161,34 +131,35 @@ class World {
     }
 
     // =========================
-    // COINS
+    // 🟡 COIN FIX (AUDIO ADDED)
     // =========================
     checkCoins() {
-
         this.level.coins.forEach((coin, index) => {
-
             if (this.character.isColliding(coin)) {
 
+                // Coin entfernen
                 this.level.coins.splice(index, 1);
 
+                // Health erhöhen
                 let healthBar = this.statusBars[0];
-
                 let newHealth = healthBar.percentage + 20;
-
                 if (newHealth > 100) newHealth = 100;
-
                 healthBar.setPercentage(newHealth);
 
                 this.character.energy = newHealth;
+
+                // =========================
+                // 🎵 COIN SOUND FIX
+                // =========================
+                if (window.gameAudio) {
+                    window.gameAudio.sounds[2].currentTime = 0;
+                    window.gameAudio.play(2);
+                }
             }
         });
     }
 
-    // =========================
-    // DRAW
-    // =========================
     draw() {
-
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.ctx.translate(this.camera_x, 0);
@@ -196,7 +167,7 @@ class World {
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
         this.addObjectsToMap(this.level.enemies);
-        this.addObjectsToMap(this.level.coins);
+        if (this.level.coins) this.addObjectsToMap(this.level.coins);
         this.addObjectsToMap(this.throwableObjects);
         this.addToMap(this.character);
 
@@ -207,15 +178,11 @@ class World {
         requestAnimationFrame(() => this.draw());
     }
 
-    // =========================
-    // HELPERS
-    // =========================
     addObjectsToMap(objects) {
         objects.forEach(o => this.addToMap(o));
     }
 
     addToMap(mo) {
-
         if (mo.otherDirection) this.flipImage(mo);
 
         mo.draw(this.ctx);
@@ -224,17 +191,15 @@ class World {
         if (mo.otherDirection) this.flipImageBack(mo);
     }
 
-    // =========================
-    // FIXED FLIP (NO BUGS)
-    // =========================
     flipImage(mo) {
         this.ctx.save();
-        this.ctx.translate(mo.x + mo.width, mo.y);
+        this.ctx.translate(mo.width, 0);
         this.ctx.scale(-1, 1);
-        this.ctx.translate(-mo.x, -mo.y);
+        mo.x = mo.x * -1;
     }
 
     flipImageBack(mo) {
+        mo.x = mo.x * -1;
         this.ctx.restore();
     }
 }
