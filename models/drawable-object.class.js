@@ -1,4 +1,7 @@
-class DrawableObject{
+/**
+ * Represents a drawable game object with images, position and dimensions.
+ */
+class DrawableObject {
     img;
     imageCache = {};
     x = 150;
@@ -7,30 +10,32 @@ class DrawableObject{
     height = 200;
     currentImage = 0;
 
+    /**
+     * Loads an image and assigns it to the object.
+     * @param {string} path - The path to the image file.
+     */
     loadImage(path) {
         this.img = new Image();
         this.img.src = path;
     }
 
-    draw(ctx){
-        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    /**
+     * Draws the object on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
+    draw(ctx) {
+        ctx.drawImage(
+            this.img,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
     }
-
-    drawFrame(ctx){
-        if(this instanceof Character || this instanceof Chicken){ 
-        ctx.beginPath();
-        ctx.lineWidth = "5";
-        ctx.strokeStyle = "blue";
-        ctx.rect(this.x, this.y, this.width, this.height)
-        ctx.stroke();
-    }
-}
 
     /**
-     * Lädt mehrere Bilder und speichert sie im imageCache.
-     * 
-     * @param {string[]} arr - Ein Array mit Bildpfaden (URLs oder relative Pfade),
-     * die geladen werden sollen.
+     * Loads multiple images and stores them in the image cache.
+     * @param {string[]} arr - An array containing image paths.
      */
     loadImages(arr) {
         arr.forEach((path) => {
@@ -40,3 +45,4 @@ class DrawableObject{
         });
     }
 }
+

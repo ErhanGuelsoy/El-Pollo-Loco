@@ -1,104 +1,253 @@
-class GameAudio {
-
-    AUDIO_FILES = [
-        "audio/dragon-studio-car-crash-sound-376882.mp3",
-        "audio/freesound_community-cartoon-jump-6462.mp3",
-        "audio/liecio-collect-points-190037.mp3",
-        "audio/spinopel-run-on-asphalt-road-393093.mp3",
-        "audio/freesound_community-chicken-single-alarm-call-6056.mp3" // 🐔 END BOSS
-    ];
-
-    constructor() {
-        this.sounds = [];
-        this.loadSounds();
-    }
-
-    loadSounds() {
-        this.AUDIO_FILES.forEach((path, i) => {
-            let audio = new Audio(path);
-            audio.preload = "auto";
-
-            // 🏃 RUN LOOP
-            if (i === 3) {
-                audio.loop = true;
-                audio.volume = 0.4;
-            }
-
-            this.sounds.push(audio);
-        });
-    }
-
-    play(index) {
-        if (this.sounds[index]) {
-            this.sounds[index].currentTime = 0;
-            this.sounds[index].play().catch(() => {});
-        }
-    }
-
-    muteAll(muted) {
-        this.sounds.forEach(sound => sound.muted = muted);
-    }
-
-    unlock() {
-        this.sounds.forEach(sound => {
-            sound.play().then(() => {
-                sound.pause();
-                sound.currentTime = 0;
-            }).catch(() => {});
-        });
-    }
-}
-
-// ================= GLOBALS =================
 let keyboard = new Keyboard();
 let canvas;
 let world;
 let gameAudio;
 let isMuted = false;
-
 let canJumpSound = true;
-let isRunning = false;
+let canPlayCoinSound = true;
 
-// ================= INIT =================
-function init(){
-    canvas = document.getElementById('canvas');
+/**
+ * Initializes the game interface and event listeners.
+ */
+function init() {
+    canvas = document.getElementById("canvas");
 
-    document.getElementById('start_game').addEventListener('click', startGame);
-    document.getElementById('startBTN').addEventListener('click', startGame);
+    const startGameScreen =
+        document.getElementById("start_game");
 
-    const audioBTN = document.getElementById("audioBTN");
+    const startButton =
+        document.getElementById("startBTN");
 
-    audioBTN.addEventListener("click", () => {
-        isMuted = !isMuted;
+    const outsideAudioBTN =
+        document.getElementById("outsideAudioBTN");
 
-        if (gameAudio) gameAudio.muteAll(isMuted);
+    startGameScreen?.addEventListener(
+        "click",
+        startGame
+    );
 
-        audioBTN.innerText = isMuted ? "🔇" : "🔊";
-    });
+    startButton?.addEventListener(
+        "click",
+        startGame
+    );
+
+    outsideAudioBTN?.addEventListener(
+        "click",
+        () => {
+            if (!gameAudio) return;
+
+            isMuted = !isMuted;
+
+            gameAudio.muteAll(isMuted);
+
+            outsideAudioBTN.innerText =
+                isMuted ? "🔇" : "🔊";
+
+            outsideAudioBTN.blur();
+        }
+    );
+
+    initImprint();
+    initPrivacy();
 }
 
-// ================= START GAME =================
-function startGame(){
+/**
+ * Initializes the imprint window and its event listeners.
+ */
+function initImprint() {
+    const imprintBTN =
+        document.getElementById("imprintBTN");
 
-    document.getElementById('start_game').style.display = 'none';
-    document.getElementById('playOverlay').style.display = 'none';
-    document.getElementById('winScreen').classList.add('hidden');
+    const imprintWindow =
+        document.getElementById("imprintWindow");
 
+    const closeImprint =
+        document.getElementById("closeImprint");
+
+    imprintBTN?.addEventListener(
+        "click",
+        () => {
+            imprintWindow.classList.remove(
+                "hidden"
+            );
+        }
+    );
+
+    closeImprint?.addEventListener(
+        "click",
+        () => {
+            imprintWindow.classList.add(
+                "hidden"
+            );
+        }
+    );
+
+    imprintWindow?.addEventListener(
+        "click",
+        e => {
+            if (e.target === imprintWindow) {
+                imprintWindow.classList.add(
+                    "hidden"
+                );
+            }
+        }
+    );
+}
+
+/**
+ * Initializes the privacy policy window and its event listeners.
+ */
+function initPrivacy() {
+    const privacyBTN =
+        document.getElementById("privacyBTN");
+
+    const privacyWindow =
+        document.getElementById("privacyWindow");
+
+    const closePrivacy =
+        document.getElementById("closePrivacy");
+
+    privacyBTN?.addEventListener(
+        "click",
+        () => {
+            privacyWindow.classList.remove(
+                "hidden"
+            );
+        }
+    );
+
+    closePrivacy?.addEventListener(
+        "click",
+        () => {
+            privacyWindow.classList.add(
+                "hidden"
+            );
+        }
+    );
+
+    privacyWindow?.addEventListener(
+        "click",
+        e => {
+            if (e.target === privacyWindow) {
+                privacyWindow.classList.add(
+                    "hidden"
+                );
+            }
+        }
+    );
+}
+
+/**
+ * Starts a new game and initializes the game world and audio.
+ */
+function startGame() {
+    hideScreens();
     initLevel();
-    world = new World(canvas, keyboard);
 
     gameAudio = new GameAudio();
-    gameAudio.unlock(); // 🔓 IMPORTANT
+    window.gameAudio = gameAudio;
 
+    if (isMuted) {
+        gameAudio.muteAll(true);
+    }
+
+    world = new World(
+        canvas,
+        keyboard
+    );
+
+    startBackgroundMusic();
     bindControlButtons();
 }
 
-// ================= JUMP =================
+/**
+ * Starts the game's background music.
+ */
+function startBackgroundMusic() {
+    gameAudio.startMusic();
+}
+
+/**
+ * Restarts the game and resets the game world,
+ * keyboard and audio.
+ */
+function restartGame() {
+    if (world) {
+        world.gameEnded = true;
+        world = null;
+    }
+
+    stopAllSounds();
+
+    keyboard = new Keyboard();
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    hideScreens();
+    initLevel();
+
+    gameAudio = new GameAudio();
+    window.gameAudio = gameAudio;
+
+    if (isMuted) {
+        gameAudio.muteAll(true);
+    }
+
+    world = new World(
+        canvas,
+        keyboard
+    );
+
+    startBackgroundMusic();
+    bindControlButtons();
+}
+
+/**
+ * Hides the start, overlay, win and lose screens.
+ */
+function hideScreens() {
+    document
+        .getElementById("start_game")
+        .style.display = "none";
+
+    document
+        .getElementById("playOverlay")
+        .style.display = "none";
+
+    document
+        .getElementById("winScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("loseScreen")
+        .classList.add("hidden");
+}
+
+/**
+ * Stops all currently playing game sounds.
+ */
+function stopAllSounds() {
+    if (!gameAudio) return;
+
+    gameAudio.stopAll();
+}
+
+/**
+ * Plays the jump sound with a short cooldown.
+ */
 function triggerJump() {
-    if (!gameAudio || !canJumpSound) return;
+    if (!gameAudio || !canJumpSound) {
+        return;
+    }
 
     gameAudio.play(1);
-
     canJumpSound = false;
 
     setTimeout(() => {
@@ -106,76 +255,258 @@ function triggerJump() {
     }, 300);
 }
 
-// ================= RUN =================
-function handleRunSound() {
-
-    if (!gameAudio) return;
-
-    const moving = keyboard.LEFT || keyboard.RIGHT;
-
-    if (moving && !isRunning) {
-        gameAudio.sounds[3].play().catch(() => {});
-        isRunning = true;
-    }
-
-    if (!moving && isRunning) {
-        gameAudio.sounds[3].pause();
-        gameAudio.sounds[3].currentTime = 0;
-        isRunning = false;
-    }
-}
-
-// ================= END BOSS SOUND (SAFE) =================
+/**
+ * Plays the endboss sound.
+ */
 function playEndbossSound() {
     if (gameAudio) {
-        gameAudio.play(4); // 🐔 END BOSS SOUND
+        gameAudio.play(4);
     }
 }
 
-// ================= KEYBOARD =================
-window.addEventListener('keydown', (e) => {
-
-    if (e.keyCode == 39) keyboard.RIGHT = true;
-    if (e.keyCode == 37) keyboard.LEFT = true;
-    if (e.keyCode == 38) keyboard.UP = true;
-    if (e.keyCode == 40) keyboard.DOWN = true;
-
-    if (e.keyCode == 32) {
-        keyboard.SPACE = true;
-        triggerJump();
+/**
+ * Plays the coin collection sound with a short cooldown.
+ */
+function playCoinSound() {
+    if (!gameAudio || !canPlayCoinSound) {
+        return;
     }
 
-    if (e.keyCode == 68) keyboard.D = true;
-});
+    gameAudio.play(2);
+    canPlayCoinSound = false;
 
-window.addEventListener('keyup', (e) => {
+    setTimeout(() => {
+        canPlayCoinSound = true;
+    }, 200);
+}
 
-    if (e.keyCode == 39) keyboard.RIGHT = false;
-    if (e.keyCode == 37) keyboard.LEFT = false;
-    if (e.keyCode == 38) keyboard.UP = false;
-    if (e.keyCode == 40) keyboard.DOWN = false;
-    if (e.keyCode == 32) keyboard.SPACE = false;
-    if (e.keyCode == 68) keyboard.D = false;
-});
+/**
+ * Handles keyboard input for player movement and actions.
+ */
+window.addEventListener(
+    "keydown",
+    e => {
+        if (e.keyCode == 39) {
+            keyboard.RIGHT = true;
+        }
 
-// ================= CONTROLS =================
+        if (e.keyCode == 37) {
+            keyboard.LEFT = true;
+        }
+
+        if (e.keyCode == 38) {
+            keyboard.UP = true;
+        }
+
+        if (e.keyCode == 40) {
+            keyboard.DOWN = true;
+        }
+
+        if (e.keyCode == 32) {
+            e.preventDefault();
+
+            keyboard.SPACE = true;
+            keyboard.UP = true;
+
+            triggerJump();
+        }
+
+        if (e.keyCode == 68) {
+            keyboard.D = true;
+        }
+    }
+);
+
+/**
+ * Handles keyboard input when a key is released.
+ */
+window.addEventListener(
+    "keyup",
+    e => {
+        if (e.keyCode == 39) {
+            keyboard.RIGHT = false;
+        }
+
+        if (e.keyCode == 37) {
+            keyboard.LEFT = false;
+        }
+
+        if (e.keyCode == 38) {
+            keyboard.UP = false;
+        }
+
+        if (e.keyCode == 40) {
+            keyboard.DOWN = false;
+        }
+
+        if (e.keyCode == 32) {
+            keyboard.SPACE = false;
+            keyboard.UP = false;
+        }
+
+        if (e.keyCode == 68) {
+            keyboard.D = false;
+        }
+    }
+);
+
+/**
+ * Binds all mobile and touch control buttons.
+ */
 function bindControlButtons() {
+    const btnLeft =
+        document.getElementById("btnLeft");
 
-    document.getElementById('btnLeft').addEventListener('pointerdown', e => keyboard.LEFT = true);
-    document.getElementById('btnLeft').addEventListener('pointerup', e => keyboard.LEFT = false);
+    const btnRight =
+        document.getElementById("btnRight");
 
-    document.getElementById('btnRight').addEventListener('pointerdown', e => keyboard.RIGHT = true);
-    document.getElementById('btnRight').addEventListener('pointerup', e => keyboard.RIGHT = false);
+    const jumpBTN =
+        document.getElementById("jumpBTN");
 
-    document.getElementById('jumpBTN').addEventListener('pointerdown', e => {
-        keyboard.UP = true;
-        triggerJump();
-    });
+    const throwButton =
+        document.getElementById("throw");
 
-    document.getElementById('jumpBTN').addEventListener('pointerup', e => {
-        keyboard.UP = false;
-    });
+    bindMovementButton(
+        btnLeft,
+        "LEFT"
+    );
 
-    document.getElementById('throw').addEventListener('pointerdown', e => keyboard.D = true);
-    document.getElementById('throw').addEventListener('pointerup', e => keyboard.D = false);
+    bindMovementButton(
+        btnRight,
+        "RIGHT"
+    );
+
+    bindJumpButton(jumpBTN);
+    bindThrowButton(throwButton);
 }
+
+/**
+ * Binds a movement button to a keyboard direction.
+ */
+function bindMovementButton(
+    button,
+    direction
+) {
+    if (!button) return;
+
+    button.addEventListener(
+        "pointerdown",
+        e => {
+            e.preventDefault();
+            keyboard[direction] = true;
+        }
+    );
+
+    button.addEventListener(
+        "pointerup",
+        () => {
+            keyboard[direction] = false;
+        }
+    );
+
+    button.addEventListener(
+        "pointercancel",
+        () => {
+            keyboard[direction] = false;
+        }
+    );
+
+    button.addEventListener(
+        "pointerleave",
+        () => {
+            keyboard[direction] = false;
+        }
+    );
+}
+
+/**
+ * Binds a button to the player's jump action.
+ */
+function bindJumpButton(button) {
+    if (!button) return;
+
+    button.addEventListener(
+        "pointerdown",
+        e => {
+            e.preventDefault();
+
+            keyboard.UP = true;
+            triggerJump();
+        }
+    );
+
+    button.addEventListener(
+        "pointerup",
+        () => {
+            keyboard.UP = false;
+        }
+    );
+
+    button.addEventListener(
+        "pointercancel",
+        () => {
+            keyboard.UP = false;
+        }
+    );
+
+    button.addEventListener(
+        "pointerleave",
+        () => {
+            keyboard.UP = false;
+        }
+    );
+}
+
+/**
+ * Binds a button to the player's throw action.
+ */
+function bindThrowButton(button) {
+    if (!button) return;
+
+    button.addEventListener(
+        "pointerdown",
+        e => {
+            e.preventDefault();
+
+            keyboard.D = true;
+        }
+    );
+
+    button.addEventListener(
+        "pointerup",
+        () => {
+            keyboard.D = false;
+        }
+    );
+
+    button.addEventListener(
+        "pointercancel",
+        () => {
+            keyboard.D = false;
+        }
+    );
+
+    button.addEventListener(
+        "pointerleave",
+        () => {
+            keyboard.D = false;
+        }
+    );
+}
+
+/**
+ * Returns the player to the main menu.
+ */
+function backToMenu() {
+    location.href = "index.html";
+}
+
+window.stopAllSounds = stopAllSounds;
+window.triggerJump = triggerJump;
+window.playEndbossSound = playEndbossSound;
+window.playCoinSound = playCoinSound;
+
+window.init = init;
+window.startGame = startGame;
+window.restartGame = restartGame;
+window.backToMenu = backToMenu;

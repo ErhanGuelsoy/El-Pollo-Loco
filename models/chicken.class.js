@@ -1,3 +1,6 @@
+/**
+ * Represents a chicken enemy that can move, be defeated and removed from the game.
+ */
 class Chicken extends MovableObject {
 
     width = 60;
@@ -14,51 +17,98 @@ class Chicken extends MovableObject {
         "img/3_enemies_chicken/chicken_normal/2_dead/dead.png"
     ];
 
-    constructor() {
+    deathSoundIndex = 0;
+
+    /**
+     * Creates a new chicken enemy with a random starting position and movement delay.
+     * @param {number} x - The initial horizontal position of the chicken.
+     */
+    constructor(x = 400 + Math.random() * 1600) {
         super();
+
         this.loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_DEAD);
 
-        this.x = 300 + Math.random() * 1000;
+        // =========================
+        // FRÜHERE SPAWN-ZONE + MEHR RANDOM
+        // =========================
+        let minX = 400;
+        let maxX = 2400;
+
+        this.x = x;
+
+        if (!x) {
+            this.x = minX + Math.random() * (maxX - minX);
+        }
+
         this.speed = 0.5 + Math.random();
+
+        this.canMove = false;
+        this.startDelay = 200 + Math.random() * 1000;
+
+        setTimeout(() => {
+            this.canMove = true;
+        }, this.startDelay);
 
         this.animate();
     }
 
+    /**
+     * Starts the chicken's movement and walking animations.
+     */
     animate() {
 
-        // 🐔 Bewegung
         setInterval(() => {
-            this.moveLeft();
 
-            // ✅ FIX: NICHT spiegeln
+            if (!this.canMove) return;
+            if (this.isDead()) return;
+
+            this.speed = 0.4 + Math.random() * 0.7;
+            this.moveLeft();
             this.otherDirection = false;
 
         }, 1000 / 60);
 
-        // 🎞️ Animation
         setInterval(() => {
-            if (!this.isDead()) {
-                this.playAnimation(this.IMAGES_WALKING);
-            }
+
+            if (!this.canMove) return;
+            if (this.isDead()) return;
+
+            this.playAnimation(this.IMAGES_WALKING);
+
         }, 200);
     }
 
-    // 💥 Wird von Flasche getroffen
+    /**
+     * Defeats the chicken by reducing its energy to zero.
+     */
     hit() {
         this.energy = 0;
         this.die();
     }
 
-    // ☠️ Tod
+    /**
+     * Handles the chicken's death animation, sound and removal.
+     */
     die() {
         this.loadImage(this.IMAGES_DEAD[0]);
         this.speed = 0;
 
-        // 🧹 nach 1 Sekunde entfernen
+        if (window.gameAudio) {
+            gameAudio.play(this.deathSoundIndex);
+        }
+
         setTimeout(() => {
             this.markedForDeletion = true;
         }, 1000);
+    }
+
+    /**
+     * Checks whether the chicken has been defeated.
+     * @returns {boolean} True if the chicken has no remaining energy.
+     */
+    isDead() {
+        return this.energy <= 0;
     }
 }

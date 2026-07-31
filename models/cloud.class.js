@@ -1,24 +1,35 @@
-class Cloud extends MovableObject{
+/**
+ * Represents a cloud that moves continuously across the game background.
+ */
+class Cloud extends MovableObject {
     y = 20;
     height = 250;
     width = 400;
     speed = 0.2;
 
-constructor(){
-    super().loadImage('img/5_background/layers/4_clouds/2.png')
+    /**
+     * Creates a new cloud with a random starting position.
+     */
+    constructor() {
+        super().loadImage("img/5_background/layers/4_clouds/2.png");
 
-    this.x = 50 + Math.random() * 500; // Zahl zwischen 200 und 700
-    this.animate();
+        this.x = 50 + Math.random() * 500;
+        this.animate();
+    }
 
-}
-animate(){
+    /**
+     * Starts the cloud's movement.
+     */
+    animate() {
+        this.moveLeft();
+    }
 
-this.moveLeft()
-}
-
-moveLeft(){
-    setInterval(() => {
-        this.x -= 0.2;
-    }, 1000 / 60);
+    /**
+     * Moves the cloud continuously to the left.
+     */
+    moveLeft() {
+        setInterval(() => {
+            this.x -= 0.2;
+        }, 1000 / 60);
     }
 }
