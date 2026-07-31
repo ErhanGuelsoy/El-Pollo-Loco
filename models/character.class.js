@@ -1,4 +1,3 @@
-
 /**
  * Represents the playable character and controls movement, animation and health.
  */
