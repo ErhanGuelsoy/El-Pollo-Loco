@@ -1,3 +1,4 @@
+
 /**
  * Represents a movable game object with movement, gravity, collision and health functionality.
  */
@@ -74,7 +75,9 @@ class MovableObject extends DrawableObject {
     }
 
     /**
-     * Checks whether this object is colliding with another movable object.
+     * Standard collision detection.
+     * Used for general collisions.
+     *
      * @param {MovableObject} mo - The object to check for collision.
      * @returns {boolean} True if the objects are colliding.
      */
@@ -92,6 +95,120 @@ class MovableObject extends DrawableObject {
     }
 
     /**
+     * Precise collision detection for collectible objects.
+     *
+     * The collision area of the character is reduced so that
+     * coins and bottles are only collected when the character
+     * is actually close to the object.
+     *
+     * @param {MovableObject} mo - The collectible object.
+     * @returns {boolean} True if the object is precisely touched.
+     */
+    isCollecting(mo) {
+        const characterOffsetX = 35;
+        const characterOffsetY = 35;
+
+        const characterLeft =
+            this.x + characterOffsetX;
+
+        const characterRight =
+            this.x +
+            this.width -
+            characterOffsetX;
+
+        const characterTop =
+            this.y + characterOffsetY;
+
+        const characterBottom =
+            this.y +
+            this.height -
+            characterOffsetY;
+
+        const objectOffsetX = 8;
+        const objectOffsetY = 8;
+
+        const objectLeft =
+            mo.x + objectOffsetX;
+
+        const objectRight =
+            mo.x +
+            mo.width -
+            objectOffsetX;
+
+        const objectTop =
+            mo.y + objectOffsetY;
+
+        const objectBottom =
+            mo.y +
+            mo.height -
+            objectOffsetY;
+
+        return (
+            characterLeft < objectRight &&
+            characterRight > objectLeft &&
+            characterTop < objectBottom &&
+            characterBottom > objectTop
+        );
+    }
+
+    /**
+     * Precise collision detection for enemies.
+     *
+     * The character must actually land on the enemy.
+     * Small side overlaps are not enough.
+     *
+     * @param {MovableObject} mo - The enemy object.
+     * @returns {boolean} True if the character hits the enemy.
+     */
+    isEnemyCollision(mo) {
+        const characterOffsetX = 40;
+        const characterOffsetTop = 20;
+        const characterOffsetBottom = 5;
+
+        const characterLeft =
+            this.x + characterOffsetX;
+
+        const characterRight =
+            this.x +
+            this.width -
+            characterOffsetX;
+
+        const characterTop =
+            this.y + characterOffsetTop;
+
+        const characterBottom =
+            this.y +
+            this.height -
+            characterOffsetBottom;
+
+        const enemyOffsetX = 10;
+        const enemyOffsetY = 5;
+
+        const enemyLeft =
+            mo.x + enemyOffsetX;
+
+        const enemyRight =
+            mo.x +
+            mo.width -
+            enemyOffsetX;
+
+        const enemyTop =
+            mo.y + enemyOffsetY;
+
+        const enemyBottom =
+            mo.y +
+            mo.height -
+            enemyOffsetY;
+
+        return (
+            characterLeft < enemyRight &&
+            characterRight > enemyLeft &&
+            characterTop < enemyBottom &&
+            characterBottom > enemyTop
+        );
+    }
+
+    /**
      * Reduces the object's energy and applies knockback after taking damage.
      */
     hit() {
@@ -99,10 +216,9 @@ class MovableObject extends DrawableObject {
 
         if (this.energy < 0) {
             this.energy = 0;
-        } else {
-            this.lastHit =
-                new Date().getTime();
         }
+
+        this.lastHit = Date.now();
 
         if (this.otherDirection) {
             this.x += 30;
@@ -112,17 +228,14 @@ class MovableObject extends DrawableObject {
     }
 
     /**
-     * Checks whether the object was hurt within the last second.
+     * Checks whether the object was hurt recently.
      * @returns {boolean} True if the object is currently hurt.
      */
     isHurt() {
-        let timepassed =
-            (
-                new Date().getTime() -
-                this.lastHit
-            ) / 1000;
+        const timePassed =
+            Date.now() - this.lastHit;
 
-        return timepassed < 1;
+        return timePassed < 250;
     }
 
     /**
@@ -156,3 +269,4 @@ class MovableObject extends DrawableObject {
         this.speedY = 30;
     }
 }
+

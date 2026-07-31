@@ -149,25 +149,31 @@ canvas {
 /* END SCREEN */
 
 .end-screen {
-    position: fixed;
-    inset: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     z-index: 999;
     display: flex;
     justify-content: center;
     align-items: center;
     background: rgba(0, 0, 0, 0.75);
+    overflow: hidden;
 }
 
 .end-screen img {
-    width: 96%;
-    height: 96%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     object-position: center;
 }
 
 .end-buttons {
     position: absolute;
-    bottom: 30px;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -512,8 +518,9 @@ canvas {
     }
 
     .end-screen img {
-        width: 94%;
-        height: 94%;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 }
 
@@ -538,8 +545,9 @@ canvas {
     }
 
     .end-screen img {
-        width: 94%;
-        height: 94%;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 }
 
@@ -549,3 +557,4 @@ canvas {
     font-family: "zabras";
     src: url("fonts/Zabars.ttf") format("truetype");
 }
+

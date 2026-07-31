@@ -26,6 +26,9 @@ class World {
 
     /**
      * Creates a new game world.
+     *
+     * @param {HTMLCanvasElement} canvas - Game canvas.
+     * @param {Keyboard} keyboard - Keyboard controls.
      */
     constructor(canvas, keyboard) {
         this.canvas = canvas;
@@ -183,7 +186,7 @@ class World {
     }
 
     /**
-     * Checks whether the character can throw a bottle.
+     * Checks whether the player can throw a bottle.
      */
     checkThrowObjects() {
         const now = Date.now();
@@ -229,6 +232,8 @@ class World {
 
     /**
      * Checks collision between character and enemy.
+     *
+     * @param {MovableObject} enemy - Enemy object.
      */
     checkCharacterEnemyCollision(enemy) {
         if (
@@ -249,6 +254,8 @@ class World {
 
     /**
      * Handles collision between character and chicken.
+     *
+     * @param {Chicken} enemy - Chicken enemy.
      */
     handleChickenCollision(enemy) {
         if (
@@ -278,7 +285,6 @@ class World {
                 this.character.height;
 
             /**
-             * IMPORTANT:
              * Do not create another jump.
              */
             this.character.speedY = 0;
@@ -309,6 +315,8 @@ class World {
 
     /**
      * Handles collision between character and endboss.
+     *
+     * @param {Endboss} enemy - Endboss object.
      */
     handleEndbossCollision(enemy) {
         if (
@@ -329,9 +337,13 @@ class World {
 
         this.lastCharacterHitTime = now;
 
+        /**
+         * The character loses only 10 health
+         * points per endboss collision.
+         */
         this.character.energy =
             Math.max(
-                this.character.energy - 20,
+                this.character.energy - 10,
                 0
             );
 
@@ -360,6 +372,8 @@ class World {
 
     /**
      * Checks bottle collisions with enemies.
+     *
+     * @param {MovableObject} enemy - Enemy object.
      */
     checkBottleEnemyCollision(enemy) {
         this.throwableObjects.forEach(
@@ -396,8 +410,9 @@ class World {
 
     /**
      * Checks whether the character collects a coin.
-     * Uses smaller hitboxes so the character
-     * must actually touch the coin.
+     *
+     * @param {Coins} coin - Coin object.
+     * @returns {boolean} True if the coin is collected.
      */
     isCollectingCoin(coin) {
         const characterLeft =
@@ -493,6 +508,10 @@ class World {
         const bottleBar =
             this.statusBars[1];
 
+        /**
+         * Do not collect any more bottles
+         * when the status bar is already full.
+         */
         if (
             bottleBar.percentageBottle >= 100
         ) {
@@ -532,39 +551,46 @@ class World {
 
     /**
      * Checks whether the character collects an item.
+     *
+     * The collision area is intentionally smaller
+     * than the visible images to prevent the bottle
+     * from being collected too early.
+     *
+     * @param {MovableObject} item - Collectible item.
+     * @returns {boolean} True if the character touches the item.
      */
     isCollectingItem(item) {
         const characterLeft =
-            this.character.x + 10;
+            this.character.x + 35;
 
         const characterRight =
             this.character.x +
             this.character.width -
-            10;
+            35;
 
         const characterTop =
-            this.character.y + 10;
+            this.character.y + 60;
 
         const characterBottom =
             this.character.y +
             this.character.height -
-            10;
+            25;
 
         const itemLeft =
-            item.x + 2;
+            item.x + 15;
 
         const itemRight =
             item.x +
             item.width -
-            2;
+            15;
 
         const itemTop =
-            item.y + 2;
+            item.y + 15;
 
         const itemBottom =
             item.y +
             item.height -
-            2;
+            15;
 
         return (
             characterRight >= itemLeft &&
@@ -672,6 +698,8 @@ class World {
 
     /**
      * Adds multiple objects to the map.
+     *
+     * @param {Array} objects - Objects to render.
      */
     addObjectsToMap(objects) {
         objects.forEach(object => {
@@ -681,6 +709,8 @@ class World {
 
     /**
      * Adds one object to the map.
+     *
+     * @param {DrawableObject} mo - Object to render.
      */
     addToMap(mo) {
         if (mo.otherDirection) {
@@ -696,6 +726,8 @@ class World {
 
     /**
      * Flips an image horizontally.
+     *
+     * @param {DrawableObject} mo - Object to flip.
      */
     flipImage(mo) {
         this.ctx.save();
@@ -715,6 +747,8 @@ class World {
 
     /**
      * Restores the original image direction.
+     *
+     * @param {DrawableObject} mo - Object to restore.
      */
     flipImageBack(mo) {
         mo.x *= -1;
