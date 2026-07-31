@@ -33,14 +33,12 @@ class World {
         this.run();
     }
 
-    /** Assigns the world to character and endboss. */
+    /** Assigns the world to character and all enemies. */
     setWorld() {
         this.character.world = this;
 
         this.level.enemies.forEach(enemy => {
-            if (enemy instanceof Endboss) {
-                enemy.world = this;
-            }
+            enemy.world = this;
         });
     }
 
@@ -77,7 +75,10 @@ class World {
     checkGameOver() {
         if (this.character.isDead() && !this.gameEnded) {
             this.gameEnded = true;
+
             this.disableCharacterMovement();
+            this.stopAllEnemies();
+
             this.showLoseScreen();
 
             if (window.stopAllSounds) {
@@ -94,6 +95,19 @@ class World {
         this.keyboard.DOWN = false;
         this.keyboard.SPACE = false;
         this.keyboard.D = false;
+    }
+
+    /** Completely stops all enemies when the game ends. */
+    stopAllEnemies() {
+        this.level.enemies.forEach(enemy => {
+            enemy.canMove = false;
+            enemy.speed = 0;
+            enemy.stopMovement = true;
+
+            if (enemy instanceof Endboss) {
+                enemy.isAttacking = false;
+            }
+        });
     }
 
     /** Handles character movement. */
@@ -114,8 +128,15 @@ class World {
 
         if (endboss.energy <= 0 && !this.gameEnded) {
             this.gameEnded = true;
+
             this.disableCharacterMovement();
+            this.stopAllEnemies();
+
             this.showWinScreen();
+
+            if (window.stopAllSounds) {
+                window.stopAllSounds();
+            }
         }
     }
 
@@ -202,7 +223,9 @@ class World {
             this.characterHitCooldown
         ) {
             this.lastCharacterHitTime = now;
+
             this.character.hit();
+
             this.statusBars[0].setPercentage(
                 this.character.energy
             );
@@ -365,11 +388,15 @@ class World {
 
         const itemLeft = item.x + 2;
         const itemRight =
-            item.x + item.width - 2;
+            item.x +
+            item.width -
+            2;
 
         const itemTop = item.y + 2;
         const itemBottom =
-            item.y + item.height - 2;
+            item.y +
+            item.height -
+            2;
 
         return (
             characterRight >= itemLeft &&
@@ -388,7 +415,10 @@ class World {
             this.canvas.height
         );
 
-        this.ctx.translate(this.camera_x, 0);
+        this.ctx.translate(
+            this.camera_x,
+            0
+        );
 
         this.addObjectsToMap(
             this.level.backgroundObjects
@@ -432,7 +462,9 @@ class World {
             this.throwableObjects
         );
 
-        this.addToMap(this.character);
+        this.addToMap(
+            this.character
+        );
 
         this.ctx.translate(
             -this.camera_x,
@@ -467,8 +499,14 @@ class World {
     /** Flips an image horizontally. */
     flipImage(mo) {
         this.ctx.save();
-        this.ctx.translate(mo.width, 0);
-        this.ctx.scale(-1, 1);
+        this.ctx.translate(
+            mo.width,
+            0
+        );
+        this.ctx.scale(
+            -1,
+            1
+        );
         mo.x *= -1;
     }
 

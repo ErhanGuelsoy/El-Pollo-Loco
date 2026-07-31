@@ -87,13 +87,14 @@ class Character extends MovableObject {
      * and animations.
      */
     animate() {
+
+        /**
+         * Character movement.
+         */
         setInterval(() => {
+
             if (!this.world) return;
 
-            /**
-             * Completely stop player movement when
-             * the game has ended.
-             */
             if (this.world.gameEnded) {
                 this.world.keyboard.LEFT = false;
                 this.world.keyboard.RIGHT = false;
@@ -105,9 +106,6 @@ class Character extends MovableObject {
                 return;
             }
 
-            /**
-             * Move character to the right.
-             */
             if (
                 this.world.keyboard.RIGHT &&
                 this.x < this.world.level.level_end_x
@@ -116,9 +114,6 @@ class Character extends MovableObject {
                 this.otherDirection = false;
             }
 
-            /**
-             * Move character to the left.
-             */
             if (
                 this.world.keyboard.LEFT &&
                 this.x > 0
@@ -127,10 +122,6 @@ class Character extends MovableObject {
                 this.otherDirection = true;
             }
 
-            /**
-             * Start jump only when the character
-             * is standing on the ground.
-             */
             if (
                 this.world.keyboard.UP &&
                 !this.isJumping &&
@@ -139,9 +130,6 @@ class Character extends MovableObject {
                 this.jump();
             }
 
-            /**
-             * Camera follows the character horizontally.
-             */
             this.world.camera_x =
                 -this.x + this.world.canvas.width / 4;
 
@@ -151,11 +139,19 @@ class Character extends MovableObject {
          * Character animations.
          */
         setInterval(() => {
+
             if (!this.world) return;
 
             /**
-             * Keep the death animation active after
-             * the character has died.
+             * Completely freeze the character animation
+             * when the game has ended.
+             */
+            if (this.world.gameEnded) {
+                return;
+            }
+
+            /**
+             * Death animation.
              */
             if (this.isDead()) {
                 this.playAnimation(this.IMAGES_DEAD);
@@ -182,11 +178,8 @@ class Character extends MovableObject {
              * Walking animation.
              */
             if (
-                !this.world.gameEnded &&
-                (
-                    this.world.keyboard.LEFT ||
-                    this.world.keyboard.RIGHT
-                )
+                this.world.keyboard.LEFT ||
+                this.world.keyboard.RIGHT
             ) {
                 this.playAnimation(this.IMAGES_WALKING);
             } else {

@@ -6,6 +6,8 @@ class Chicken extends MovableObject {
     width = 60;
     height = 60;
     y = 360;
+    canMove = false;
+    stopMovement = false;
 
     IMAGES_WALKING = [
         "img/3_enemies_chicken/chicken_normal/1_walk/1_w.png",
@@ -30,9 +32,6 @@ class Chicken extends MovableObject {
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_DEAD);
 
-        // =========================
-        // FRÜHERE SPAWN-ZONE + MEHR RANDOM
-        // =========================
         let minX = 400;
         let maxX = 2400;
 
@@ -45,9 +44,13 @@ class Chicken extends MovableObject {
         this.speed = 0.5 + Math.random();
 
         this.canMove = false;
+        this.stopMovement = false;
+
         this.startDelay = 200 + Math.random() * 1000;
 
         setTimeout(() => {
+            if (this.stopMovement) return;
+
             this.canMove = true;
         }, this.startDelay);
 
@@ -62,6 +65,7 @@ class Chicken extends MovableObject {
         setInterval(() => {
 
             if (!this.canMove) return;
+            if (this.stopMovement) return;
             if (this.isDead()) return;
 
             this.speed = 0.4 + Math.random() * 0.7;
@@ -73,6 +77,7 @@ class Chicken extends MovableObject {
         setInterval(() => {
 
             if (!this.canMove) return;
+            if (this.stopMovement) return;
             if (this.isDead()) return;
 
             this.playAnimation(this.IMAGES_WALKING);
@@ -94,6 +99,8 @@ class Chicken extends MovableObject {
     die() {
         this.loadImage(this.IMAGES_DEAD[0]);
         this.speed = 0;
+        this.canMove = false;
+        this.stopMovement = true;
 
         if (window.gameAudio) {
             gameAudio.play(this.deathSoundIndex);
