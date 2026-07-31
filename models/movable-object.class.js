@@ -14,14 +14,20 @@ class MovableObject extends DrawableObject {
      */
     applyGravity() {
         setInterval(() => {
-            if (this.isAboveGround() || this.speedY > 0) {
+            if (
+                this.isAboveGround() ||
+                this.speedY > 0
+            ) {
                 this.y -= this.speedY;
                 this.speedY -= this.acceleration;
 
                 /**
                  * Keeps the character exactly on the ground.
                  */
-                if (this instanceof Character && this.y >= this.groundY) {
+                if (
+                    this instanceof Character &&
+                    this.y >= this.groundY
+                ) {
                     this.y = this.groundY;
                     this.speedY = 0;
                     this.isJumping = false;
@@ -35,11 +41,15 @@ class MovableObject extends DrawableObject {
      * @returns {boolean} True if the object is above the ground.
      */
     isAboveGround() {
-        if (this instanceof ThrowableObject) {
+        if (
+            this instanceof ThrowableObject
+        ) {
             return true;
         }
 
-        if (this instanceof Character) {
+        if (
+            this instanceof Character
+        ) {
             return this.y < this.groundY;
         }
 
@@ -48,12 +58,18 @@ class MovableObject extends DrawableObject {
 
     /**
      * Plays an animation using the provided image sequence.
-     * @param {string[]} images - An array containing the paths of the animation images.
+     * @param {string[]} images - An array containing the image paths.
      */
     playAnimation(images) {
-        let i = this.currentImage % images.length;
+        let i =
+            this.currentImage %
+            images.length;
+
         let path = images[i];
-        this.img = this.imageCache[path];
+
+        this.img =
+            this.imageCache[path];
+
         this.currentImage++;
     }
 
@@ -63,10 +79,16 @@ class MovableObject extends DrawableObject {
      * @returns {boolean} True if the objects are colliding.
      */
     isColliding(mo) {
-        return this.x < mo.x + mo.width &&
-            this.x + this.width > mo.x &&
-            this.y < mo.y + mo.height &&
-            this.y + this.height > mo.y;
+        return (
+            this.x <
+                mo.x + mo.width &&
+            this.x + this.width >
+                mo.x &&
+            this.y <
+                mo.y + mo.height &&
+            this.y + this.height >
+                mo.y
+        );
     }
 
     /**
@@ -78,7 +100,8 @@ class MovableObject extends DrawableObject {
         if (this.energy < 0) {
             this.energy = 0;
         } else {
-            this.lastHit = new Date().getTime();
+            this.lastHit =
+                new Date().getTime();
         }
 
         if (this.otherDirection) {
@@ -94,7 +117,10 @@ class MovableObject extends DrawableObject {
      */
     isHurt() {
         let timepassed =
-            (new Date().getTime() - this.lastHit) / 1000;
+            (
+                new Date().getTime() -
+                this.lastHit
+            ) / 1000;
 
         return timepassed < 1;
     }

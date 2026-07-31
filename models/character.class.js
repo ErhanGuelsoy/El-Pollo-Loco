@@ -53,6 +53,19 @@ class Character extends MovableObject {
         "img/2_character_pepe/4_hurt/H-43.png"
     ];
 
+    IMAGES_IDLE = [
+        "img/2_character_pepe/1_idle/idle/idle_1.png",
+        "img/2_character_pepe/1_idle/idle/idle_2.png",
+        "img/2_character_pepe/1_idle/idle/idle_3.png",
+        "img/2_character_pepe/1_idle/idle/idle_4.png",
+        "img/2_character_pepe/1_idle/idle/idle_5.png",
+        "img/2_character_pepe/1_idle/idle/idle_6.png",
+        "img/2_character_pepe/1_idle/idle/idle_7.png",
+        "img/2_character_pepe/1_idle/idle/idle_8.png",
+        "img/2_character_pepe/1_idle/idle/idle_9.png",
+        "img/2_character_pepe/1_idle/idle/idle_10.png"
+    ];
+
     IMAGE_LOST_GAME = [
         "img/You won, you lost/You lost.png"
     ];
@@ -72,11 +85,13 @@ class Character extends MovableObject {
         this.speedY = 0;
         this.isJumping = false;
 
-        this.loadImage(this.IMAGES_WALKING[0]);
+        this.loadImage(this.IMAGES_IDLE[0]);
+
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
         this.loadImages(this.IMAGES_DEAD);
         this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_IDLE);
 
         this.applyGravity();
         this.animate();
@@ -182,10 +197,13 @@ class Character extends MovableObject {
                 this.world.keyboard.RIGHT
             ) {
                 this.playAnimation(this.IMAGES_WALKING);
-            } else {
-                this.img =
-                    this.imageCache[this.IMAGES_WALKING[0]];
+                return;
             }
+
+            /**
+             * Idle animation.
+             */
+            this.playAnimation(this.IMAGES_IDLE);
 
         }, 100);
     }

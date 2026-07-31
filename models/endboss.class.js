@@ -33,6 +33,13 @@ class Endboss extends MovableObject {
         "img/4_enemie_boss_chicken/3_attack/G20.png"
     ];
 
+    IMAGES_ENDBOSS_WALK = [
+        "img/4_enemie_boss_chicken/1_walk/G1.png",
+        "img/4_enemie_boss_chicken/1_walk/G2.png",
+        "img/4_enemie_boss_chicken/1_walk/G3.png",
+        "img/4_enemie_boss_chicken/1_walk/G4.png"
+    ];
+
     IMAGES_ENDBOSS_DAMAGE = [
         "img/4_enemie_boss_chicken/4_hurt/G21.png",
         "img/4_enemie_boss_chicken/4_hurt/G22.png",
@@ -50,14 +57,19 @@ class Endboss extends MovableObject {
      */
     constructor() {
         super();
-        this.loadImage(this.IMAGES_WALKING[0]);
-        this.loadImages(this.IMAGES_WALKING);
-        this.loadImages(this.IMAGES_ATTACK);
-        this.loadImages(this.IMAGES_ENDBOSS_DAMAGE);
-        this.loadImages(this.IMAGES_ENDBOSS_DEATH);
+
         this.x = 2300;
         this.y = 50;
         this.currentImage = 0;
+
+        this.loadImage(this.IMAGES_ENDBOSS_WALK[0]);
+
+        this.loadImages(this.IMAGES_WALKING);
+        this.loadImages(this.IMAGES_ATTACK);
+        this.loadImages(this.IMAGES_ENDBOSS_WALK);
+        this.loadImages(this.IMAGES_ENDBOSS_DAMAGE);
+        this.loadImages(this.IMAGES_ENDBOSS_DEATH);
+
         this.animate();
     }
 
@@ -66,6 +78,7 @@ class Endboss extends MovableObject {
      */
     animate() {
         setInterval(() => {
+
             if (this.isDead()) {
                 this.isAttacking = false;
                 this.playAnimation(this.IMAGES_ENDBOSS_DEATH);
@@ -77,11 +90,13 @@ class Endboss extends MovableObject {
             }
 
             if (!this.hadFirstContact) {
-                this.playSlowAnimation(this.IMAGES_WALKING);
+                this.img = this.imageCache[this.IMAGES_ENDBOSS_WALK[0]];
                 return;
             }
 
-            if (this.isAttacking) return;
+            if (this.isAttacking) {
+                return;
+            }
 
             if (this.isCharacterInAttackRange()) {
                 this.startAttack();
@@ -93,13 +108,14 @@ class Endboss extends MovableObject {
             if (this.isHurt()) {
                 this.playAnimation(this.IMAGES_ENDBOSS_DAMAGE);
             } else {
-                this.playSlowAnimation(this.IMAGES_WALKING);
+                this.playSlowAnimation(this.IMAGES_ENDBOSS_WALK);
             }
+
         }, 1000 / 60);
     }
 
     /**
-     * Plays the walking animation at a slower speed.
+     * Plays the endboss walking animation.
      * @param {Array} images - Animation images.
      */
     playSlowAnimation(images) {
@@ -124,9 +140,20 @@ class Endboss extends MovableObject {
      */
     isCharacterInAttackRange() {
         const character = this.world.character;
-        const bossCenter = this.x + this.width / 2;
-        const characterCenter = character.x + character.width / 2;
-        const distance = Math.abs(characterCenter - bossCenter);
+
+        const bossCenter =
+            this.x +
+            this.width / 2;
+
+        const characterCenter =
+            character.x +
+            character.width / 2;
+
+        const distance =
+            Math.abs(
+                characterCenter -
+                bossCenter
+            );
 
         return distance <= 140;
     }
@@ -135,10 +162,20 @@ class Endboss extends MovableObject {
      * Moves the boss towards the character.
      */
     followCharacter() {
-        const character = this.world.character;
-        const bossCenter = this.x + this.width / 2;
-        const characterCenter = character.x + character.width / 2;
-        const distance = characterCenter - bossCenter;
+        const character =
+            this.world.character;
+
+        const bossCenter =
+            this.x +
+            this.width / 2;
+
+        const characterCenter =
+            character.x +
+            character.width / 2;
+
+        const distance =
+            characterCenter -
+            bossCenter;
 
         if (distance < -50) {
             this.moveLeft();
@@ -156,15 +193,30 @@ class Endboss extends MovableObject {
      * Starts the endboss attack animation.
      */
     startAttack() {
-        if (this.isAttacking || this.isDead()) return;
+        if (
+            this.isAttacking ||
+            this.isDead()
+        ) {
+            return;
+        }
 
         const now = Date.now();
 
-        if (now - this.lastAttackTime < 800) return;
+        if (
+            now - this.lastAttackTime <
+            800
+        ) {
+            return;
+        }
 
         this.isAttacking = true;
         this.attackDamageApplied = false;
-        this.playAnimation(this.IMAGES_ATTACK);
+
+        this.currentImage = 0;
+
+        this.playAnimation(
+            this.IMAGES_ATTACK
+        );
 
         setTimeout(() => {
             this.isAttacking = false;
@@ -177,7 +229,9 @@ class Endboss extends MovableObject {
      * Reduces endboss energy by 20.
      */
     hit() {
-        if (this.isDead()) return;
+        if (this.isDead()) {
+            return;
+        }
 
         this.energy -= 20;
 
@@ -214,4 +268,3 @@ class Endboss extends MovableObject {
         return this.energy <= 0;
     }
 }
-
