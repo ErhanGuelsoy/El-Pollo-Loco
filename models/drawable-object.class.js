@@ -21,7 +21,7 @@ class DrawableObject {
 
     /**
      * Draws the object on the canvas.
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     * @param {CanvasRenderingContext2D} ctx - The canvas context.
      */
     draw(ctx) {
         ctx.drawImage(
@@ -35,14 +35,13 @@ class DrawableObject {
 
     /**
      * Loads multiple images and stores them in the image cache.
-     * @param {string[]} arr - An array containing image paths.
+     * @param {string[]} arr - Image paths.
      */
     loadImages(arr) {
         arr.forEach((path) => {
-            let img = new Image();
+            const img = new Image();
             img.src = path;
             this.imageCache[path] = img;
         });
     }
 }
-

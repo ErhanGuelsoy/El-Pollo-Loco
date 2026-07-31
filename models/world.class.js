@@ -13,7 +13,8 @@ class World {
     statusBars = [
         new StatusBar("health", 0),
         new StatusBar("bottle", 70),
-        new StatusBar("endboss", 140)
+        new StatusBar("coins", 140),
+        new StatusBar("endboss", 210)
     ];
 
     throwableObjects = [];
@@ -160,7 +161,10 @@ class World {
             this.lastThrowTime = now;
 
             bottleBar.setPercentageBottle(
-                Math.max(bottleBar.percentageBottle - 20, 0)
+                Math.max(
+                    bottleBar.percentageBottle - 20,
+                    0
+                )
             );
         }
     }
@@ -278,7 +282,7 @@ class World {
 
             if (enemy instanceof Endboss) {
                 enemy.hit();
-                this.statusBars[2].reduceEndboss();
+                this.statusBars[3].reduceEndboss();
 
                 if (window.gameAudio) {
                     window.gameAudio.play(4);
@@ -294,24 +298,32 @@ class World {
     /** Checks whether the character collects a coin. */
     isCollectingCoin(coin) {
         const characterLeft = this.character.x + 10;
+
         const characterRight =
             this.character.x +
             this.character.width -
             10;
 
         const characterTop = this.character.y + 10;
+
         const characterBottom =
             this.character.y +
             this.character.height -
             10;
 
         const coinLeft = coin.x + 2;
+
         const coinRight =
-            coin.x + coin.width - 2;
+            coin.x +
+            coin.width -
+            2;
 
         const coinTop = coin.y + 2;
+
         const coinBottom =
-            coin.y + coin.height - 2;
+            coin.y +
+            coin.height -
+            2;
 
         return (
             characterRight >= coinLeft &&
@@ -330,15 +342,14 @@ class World {
 
             this.level.coins.splice(index, 1);
 
-            const healthBar = this.statusBars[0];
+            const coinBar = this.statusBars[2];
 
-            const newHealth = Math.min(
-                healthBar.percentage + 20,
+            const newCoins = Math.min(
+                coinBar.percentageCoins + 20,
                 100
             );
 
-            healthBar.setPercentage(newHealth);
-            this.character.energy = newHealth;
+            coinBar.setPercentageCoins(newCoins);
 
             if (window.gameAudio) {
                 window.gameAudio.play(2);
@@ -387,12 +398,14 @@ class World {
             10;
 
         const itemLeft = item.x + 2;
+
         const itemRight =
             item.x +
             item.width -
             2;
 
         const itemTop = item.y + 2;
+
         const itemBottom =
             item.y +
             item.height -
@@ -499,14 +512,17 @@ class World {
     /** Flips an image horizontally. */
     flipImage(mo) {
         this.ctx.save();
+
         this.ctx.translate(
             mo.width,
             0
         );
+
         this.ctx.scale(
             -1,
             1
         );
+
         mo.x *= -1;
     }
 
