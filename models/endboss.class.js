@@ -383,45 +383,51 @@ class Endboss extends MovableObject {
     /**
      * Reduces endboss energy by 20.
      */
-    hit() {
-        if (this.isDead()) {
-            return;
-        }
-
-        const now = Date.now();
-
-        if (
-            now - this.lastBossHitTime <
-            this.bossHitCooldown
-        ) {
-            return;
-        }
-
-        this.lastBossHitTime = now;
-
-        this.energy -= 20;
-
-        if (this.energy < 0) {
-            this.energy = 0;
-        }
-
-        this.lastHit = now;
-
-        this.isAttacking = false;
-        this.currentImage = 0;
-
-        /**
-         * Reset death animation state when
-         * the boss is not dead yet.
-         */
-        this.deathAnimationStarted = false;
-        this.deathAnimationFinished = false;
-        this.deathAnimationStartTime = 0;
-
-        if (window.gameAudio) {
-            window.gameAudio.play(4);
-        }
+    /**
+ * Reduces endboss energy by 10.
+ */
+hit() {
+    if (this.isDead()) {
+        return;
     }
+
+    const now = Date.now();
+
+    if (
+        now - this.lastBossHitTime <
+        this.bossHitCooldown
+    ) {
+        return;
+    }
+
+    this.lastBossHitTime = now;
+
+    /**
+     * Boss loses only 10 energy per bottle hit.
+     */
+    this.energy -= 10;
+
+    if (this.energy < 0) {
+        this.energy = 0;
+    }
+
+    this.lastHit = now;
+
+    this.isAttacking = false;
+    this.currentImage = 0;
+
+    /**
+     * Reset death animation state when
+     * the boss is not dead yet.
+     */
+    this.deathAnimationStarted = false;
+    this.deathAnimationFinished = false;
+    this.deathAnimationStartTime = 0;
+
+    if (window.gameAudio) {
+        window.gameAudio.play(4);
+    }
+}
 
     /**
      * Moves the boss to the right.

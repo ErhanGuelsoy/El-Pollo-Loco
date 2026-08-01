@@ -63,9 +63,16 @@ function initLevel() {
 
         // Collectible bottles
         [
-            new CollectBottle(320, 400),
+            new CollectBottle(200, 300),
+            new CollectBottle(300, 400),
+            new CollectBottle(290, 700),
+            new CollectBottle(290, 700),
+            new CollectBottle(300, 400),
             new CollectBottle(290, 700),
             new CollectBottle(400, 350),
+            new CollectBottle(800, 350),
+            new CollectBottle(1000, 280),
+            new CollectBottle(1150, 360),
             new CollectBottle(800, 350),
             new CollectBottle(1000, 280),
             new CollectBottle(1150, 360),
