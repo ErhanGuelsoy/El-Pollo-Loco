@@ -1,4 +1,3 @@
-
 class Endboss extends MovableObject {
 
     height = 400;
@@ -6,17 +5,22 @@ class Endboss extends MovableObject {
     y = 50;
     energy = 100;
     speed = 2;
+
     hadFirstContact = false;
     isAttacking = false;
     attackDamageApplied = false;
+
     lastAttackTime = 0;
     lastBossHitTime = 0;
     bossHitCooldown = 250;
+
     animationSpeed = 200;
     lastAnimationTime = 0;
+
     deathAnimationStarted = false;
     deathAnimationFinished = false;
     deathAnimationStartTime = 0;
+
 
     IMAGES_WALKING = [
         "img/4_enemie_boss_chicken/2_alert/G5.png",
@@ -58,71 +62,39 @@ class Endboss extends MovableObject {
         "img/4_enemie_boss_chicken/5_dead/G26.png"
     ];
 
-    /**
-     * Creates a new endboss and loads its images.
-     */
+
     constructor() {
         super();
 
         this.x = 2300;
-        this.y = 50;
         this.currentImage = 0;
 
-        this.loadImage(
-            this.IMAGES_ENDBOSS_WALK[0]
-        );
+        this.loadImage(this.IMAGES_ENDBOSS_WALK[0]);
 
-        this.loadImages(
-            this.IMAGES_WALKING
-        );
-
-        this.loadImages(
-            this.IMAGES_ATTACK
-        );
-
-        this.loadImages(
-            this.IMAGES_ENDBOSS_WALK
-        );
-
-        this.loadImages(
-            this.IMAGES_ENDBOSS_DAMAGE
-        );
-
-        this.loadImages(
-            this.IMAGES_ENDBOSS_DEATH
-        );
+        this.loadImages(this.IMAGES_WALKING);
+        this.loadImages(this.IMAGES_ATTACK);
+        this.loadImages(this.IMAGES_ENDBOSS_WALK);
+        this.loadImages(this.IMAGES_ENDBOSS_DAMAGE);
+        this.loadImages(this.IMAGES_ENDBOSS_DEATH);
 
         this.animate();
     }
 
-    /**
-     * Controls endboss movement and animations.
-     */
+
     animate() {
         setInterval(() => {
 
-            /**
-             * Death animation has priority.
-             */
             if (this.isDead()) {
                 this.handleDeathAnimation();
                 return;
             }
 
-            if (
-                !this.world ||
-                !this.world.character ||
-                this.world.gameEnded
-            ) {
+            if (!this.world || !this.world.character || this.world.gameEnded) {
                 return;
             }
 
             if (!this.hadFirstContact) {
-                this.img =
-                    this.imageCache[
-                        this.IMAGES_ENDBOSS_WALK[0]
-                    ];
-
+                this.img = this.imageCache[this.IMAGES_ENDBOSS_WALK[0]];
                 return;
             }
 
@@ -137,51 +109,33 @@ class Endboss extends MovableObject {
 
             this.followCharacter();
 
-            if (this.isHurt()) {
-                this.playDamageAnimation();
-            } else {
-                this.playSlowAnimation(
-                    this.IMAGES_ENDBOSS_WALK
-                );
-            }
+            this.isHurt()
+                ? this.playDamageAnimation()
+                : this.playSlowAnimation(this.IMAGES_ENDBOSS_WALK);
 
         }, 1000 / 60);
     }
 
-    /**
-     * Handles the endboss death animation.
-     *
-     * The animation starts only once and stops
-     * permanently on the final death image.
-     */
+
     handleDeathAnimation() {
+
         this.isAttacking = false;
         this.attackDamageApplied = false;
         this.speed = 0;
 
-        /**
-         * Start death animation only once.
-         */
         if (!this.deathAnimationStarted) {
-            this.deathAnimationStarted = true;
-            this.deathAnimationStartTime =
-                Date.now();
 
-            this.currentImage = 0;
+            this.deathAnimationStarted = true;
+            this.deathAnimationStartTime = Date.now();
 
             this.img =
-                this.imageCache[
-                    this.IMAGES_ENDBOSS_DEATH[0]
-                ];
+                this.imageCache[this.IMAGES_ENDBOSS_DEATH[0]];
 
             return;
         }
 
-        /**
-         * If the final death frame has already
-         * been reached, keep it permanently.
-         */
         if (this.deathAnimationFinished) {
+
             this.img =
                 this.imageCache[
                     this.IMAGES_ENDBOSS_DEATH[
@@ -192,150 +146,80 @@ class Endboss extends MovableObject {
             return;
         }
 
-        const now = Date.now();
-
-        /**
-         * Controls the speed of the death animation.
-         */
-        const frameDuration = 180;
-
-        const elapsed =
-            now -
-            this.deathAnimationStartTime;
-
-        let frame =
-            Math.floor(
-                elapsed / frameDuration
+        const frame =
+            Math.min(
+                Math.floor(
+                    (Date.now() - this.deathAnimationStartTime) / 180
+                ),
+                this.IMAGES_ENDBOSS_DEATH.length - 1
             );
 
-        /**
-         * Stop at the last frame.
-         */
-        if (
-            frame >=
-            this.IMAGES_ENDBOSS_DEATH.length
-        ) {
-            frame =
-                this.IMAGES_ENDBOSS_DEATH.length - 1;
-
+        if (frame === this.IMAGES_ENDBOSS_DEATH.length - 1) {
             this.deathAnimationFinished = true;
         }
 
         this.img =
-            this.imageCache[
-                this.IMAGES_ENDBOSS_DEATH[frame]
-            ];
+            this.imageCache[this.IMAGES_ENDBOSS_DEATH[frame]];
     }
 
-    /**
-     * Plays the short endboss damage animation.
-     */
+
     playDamageAnimation() {
-        const now = Date.now();
 
-        const damageTime =
-            now - this.lastHit;
-
-        const frameDuration = 80;
-
-        let frame =
-            Math.floor(
-                damageTime / frameDuration
+        const frame =
+            Math.min(
+                Math.floor((Date.now() - this.lastHit) / 80),
+                this.IMAGES_ENDBOSS_DAMAGE.length - 1
             );
 
-        if (
-            frame >=
-            this.IMAGES_ENDBOSS_DAMAGE.length
-        ) {
-            frame =
-                this.IMAGES_ENDBOSS_DAMAGE.length - 1;
-        }
-
         this.img =
-            this.imageCache[
-                this.IMAGES_ENDBOSS_DAMAGE[frame]
-            ];
+            this.imageCache[this.IMAGES_ENDBOSS_DAMAGE[frame]];
     }
 
-    /**
-     * Plays the endboss walking animation.
-     *
-     * @param {Array} images - Animation images.
-     */
-    playSlowAnimation(images) {
-        const now = Date.now();
 
-        if (
-            now - this.lastAnimationTime >=
-            this.animationSpeed
-        ) {
+    playSlowAnimation(images) {
+
+        if (Date.now() - this.lastAnimationTime >= this.animationSpeed) {
+
             this.currentImage++;
 
-            if (
-                this.currentImage >=
-                images.length
-            ) {
+            if (this.currentImage >= images.length) {
                 this.currentImage = 0;
             }
 
-            this.lastAnimationTime = now;
+            this.lastAnimationTime = Date.now();
         }
 
         this.img =
-            this.imageCache[
-                images[this.currentImage]
-            ];
+            this.imageCache[images[this.currentImage]];
     }
 
-    /**
-     * Checks whether the character is within attack range.
-     *
-     * @returns {boolean} True if the character is close enough.
-     */
+
     isCharacterInAttackRange() {
-        const character =
-            this.world.character;
 
-        const bossCenter =
-            this.x +
-            this.width / 2;
-
-        const characterCenter =
-            character.x +
-            character.width / 2;
+        const character = this.world.character;
 
         const distance =
             Math.abs(
-                characterCenter -
-                bossCenter
+                (character.x + character.width / 2) -
+                (this.x + this.width / 2)
             );
 
         return distance <= 140;
     }
 
-    /**
-     * Moves the boss towards the character.
-     */
+
     followCharacter() {
-        const character =
-            this.world.character;
 
-        const bossCenter =
-            this.x +
-            this.width / 2;
-
-        const characterCenter =
-            character.x +
-            character.width / 2;
+        const character = this.world.character;
 
         const distance =
-            characterCenter -
-            bossCenter;
+            (character.x + character.width / 2) -
+            (this.x + this.width / 2);
+
 
         if (distance < -50) {
             this.moveLeft();
             this.otherDirection = false;
-            return;
         }
 
         if (distance > 50) {
@@ -344,120 +228,79 @@ class Endboss extends MovableObject {
         }
     }
 
-    /**
-     * Starts the endboss attack animation.
-     */
+
     startAttack() {
-        if (
-            this.isAttacking ||
-            this.isDead()
-        ) {
+
+        if (this.isAttacking || this.isDead()) {
             return;
         }
 
-        const now = Date.now();
-
-        if (
-            now - this.lastAttackTime <
-            800
-        ) {
+        if (Date.now() - this.lastAttackTime < 800) {
             return;
         }
 
         this.isAttacking = true;
         this.attackDamageApplied = false;
 
-        this.currentImage = 0;
-
-        this.playAnimation(
-            this.IMAGES_ATTACK
-        );
+        this.playAnimation(this.IMAGES_ATTACK);
 
         setTimeout(() => {
+
             this.isAttacking = false;
-            this.attackDamageApplied = false;
             this.lastAttackTime = Date.now();
+
         }, 800);
     }
 
-    /**
-     * Reduces endboss energy by 20.
-     */
-    /**
- * Reduces endboss energy by 10.
- */
-hit() {
-    if (this.isDead()) {
-        return;
+
+    hit() {
+
+        if (this.isDead()) {
+            return;
+        }
+
+        if (Date.now() - this.lastBossHitTime < this.bossHitCooldown) {
+            return;
+        }
+
+        this.lastBossHitTime = Date.now();
+
+        this.energy -= 10;
+
+        if (this.energy < 0) {
+            this.energy = 0;
+        }
+
+        this.lastHit = Date.now();
+
+        this.isAttacking = false;
+
+        this.deathAnimationStarted = false;
+        this.deathAnimationFinished = false;
+
+        if (window.gameAudio) {
+            window.gameAudio.play(4);
+        }
     }
 
-    const now = Date.now();
 
-    if (
-        now - this.lastBossHitTime <
-        this.bossHitCooldown
-    ) {
-        return;
-    }
-
-    this.lastBossHitTime = now;
-
-    /**
-     * Boss loses only 10 energy per bottle hit.
-     */
-    this.energy -= 10;
-
-    if (this.energy < 0) {
-        this.energy = 0;
-    }
-
-    this.lastHit = now;
-
-    this.isAttacking = false;
-    this.currentImage = 0;
-
-    /**
-     * Reset death animation state when
-     * the boss is not dead yet.
-     */
-    this.deathAnimationStarted = false;
-    this.deathAnimationFinished = false;
-    this.deathAnimationStartTime = 0;
-
-    if (window.gameAudio) {
-        window.gameAudio.play(4);
-    }
-}
-
-    /**
-     * Moves the boss to the right.
-     */
     moveRight() {
-        if (this.isDead()) {
-            return;
-        }
 
-        this.x += this.speed;
+        if (!this.isDead()) {
+            this.x += this.speed;
+        }
     }
 
-    /**
-     * Moves the boss to the left.
-     */
+
     moveLeft() {
-        if (this.isDead()) {
-            return;
-        }
 
-        this.x -= this.speed;
+        if (!this.isDead()) {
+            this.x -= this.speed;
+        }
     }
 
-    /**
-     * Checks whether the endboss is dead.
-     *
-     * @returns {boolean} True if the endboss has no energy left.
-     */
+
     isDead() {
         return this.energy <= 0;
     }
 }
-

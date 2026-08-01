@@ -24,56 +24,36 @@ class World {
     endbossTriggered = false;
     gameEnded = false;
 
-    /**
-     * Creates a new game world.
-     *
-     * @param {HTMLCanvasElement} canvas - Game canvas.
-     * @param {Keyboard} keyboard - Keyboard controls.
-     */
     constructor(canvas, keyboard) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
         this.keyboard = keyboard;
-
         this.setWorld();
         this.draw();
         this.run();
     }
 
-    /**
-     * Assigns the world to character and all enemies.
-     */
     setWorld() {
         this.character.world = this;
-
-        this.level.enemies.forEach(enemy => {
-            enemy.world = this;
-        });
+        this.level.enemies.forEach(e => e.world = this);
     }
 
-    /**
-     * Displays the win screen.
-     */
-    showWinScreen() {
-        document
-            .getElementById("winScreen")
-            .classList
-            .remove("hidden");
+    playSound(id) {
+        window.gameAudio?.play(id);
     }
 
-    /**
-     * Displays the lose screen.
-     */
-    showLoseScreen() {
-        document
-            .getElementById("loseScreen")
-            .classList
-            .remove("hidden");
+    showScreen(id) {
+        document.getElementById(id).classList.remove("hidden");
     }
 
-    /**
-     * Starts the game loop.
-     */
+    endGame(screen) {
+        this.gameEnded = true;
+        this.disableCharacterMovement();
+        this.stopAllEnemies();
+        this.showScreen(screen);
+        window.stopAllSounds?.();
+    }
+
     run() {
         setInterval(() => {
             if (this.gameEnded) return;
@@ -84,280 +64,145 @@ class World {
             this.checkThrowObjects();
 
             this.level.enemies =
-                this.level.enemies.filter(
-                    enemy =>
-                        !enemy.markedForDeletion
-                );
+                this.level.enemies.filter(e => !e.markedForDeletion);
 
-            this.handleMovement();
             this.handleEndboss();
-
         }, 1000 / 60);
     }
 
-    /**
-     * Checks whether the player has died.
-     */
-    checkGameOver() {
-        if (
-            this.character.isDead() &&
-            !this.gameEnded
-        ) {
-            this.gameEnded = true;
-
-            this.disableCharacterMovement();
-            this.stopAllEnemies();
-
-            this.showLoseScreen();
-
-            if (window.stopAllSounds) {
-                window.stopAllSounds();
-            }
-        }
-    }
-
-    /**
-     * Disables all player controls.
-     */
     disableCharacterMovement() {
-        this.keyboard.LEFT = false;
-        this.keyboard.RIGHT = false;
-        this.keyboard.UP = false;
-        this.keyboard.DOWN = false;
-        this.keyboard.SPACE = false;
+        this.keyboard.LEFT =
+        this.keyboard.RIGHT =
+        this.keyboard.UP =
+        this.keyboard.DOWN =
+        this.keyboard.SPACE =
         this.keyboard.D = false;
     }
 
-    /**
-     * Completely stops all enemies when the game ends.
-     */
     stopAllEnemies() {
-        this.level.enemies.forEach(enemy => {
-            enemy.canMove = false;
-            enemy.speed = 0;
-            enemy.stopMovement = true;
+        this.level.enemies.forEach(e => {
+            e.canMove = false;
+            e.speed = 0;
+            e.stopMovement = true;
 
-            if (enemy instanceof Endboss) {
-                enemy.isAttacking = false;
-            }
+            if (e instanceof Endboss)
+                e.isAttacking = false;
         });
     }
 
-    /**
-     * Handles character movement.
-     */
-    handleMovement() {}
-
-    /**
-     * Handles endboss activation and defeat.
-     */
-    handleEndboss() {
-        const endboss =
-            this.level.enemies.find(
-                enemy =>
-                    enemy instanceof Endboss
-            );
-
-        if (!endboss) return;
-
-        if (
-            this.character.x >= 2000 &&
-            !this.endbossTriggered
-        ) {
-            this.endbossTriggered = true;
-            endboss.hadFirstContact = true;
-        }
-
-        if (
-            endboss.energy <= 0 &&
-            !this.gameEnded
-        ) {
-            this.gameEnded = true;
-
-            this.disableCharacterMovement();
-            this.stopAllEnemies();
-
-            this.showWinScreen();
-
-            if (window.stopAllSounds) {
-                window.stopAllSounds();
-            }
-        }
+    checkGameOver() {
+        if (this.character.isDead() && !this.gameEnded)
+            this.endGame("loseScreen");
     }
 
-    /**
-     * Checks whether the player can throw a bottle.
-     */
+    handleEndboss() {
+        const boss = this.level.enemies.find(e => e instanceof Endboss);
+        if (!boss) return;
+
+        if (this.character.x >= 2000 && !this.endbossTriggered) {
+            this.endbossTriggered = true;
+            boss.hadFirstContact = true;
+        }
+
+        if (boss.energy <= 0 && !this.gameEnded)
+            this.endGame("winScreen");
+    }
+
     checkThrowObjects() {
         const now = Date.now();
-        const bottleBar =
-            this.statusBars[1];
+        const bar = this.statusBars[1];
 
         if (
             this.keyboard.D &&
-            bottleBar.percentageBottle > 0 &&
+            bar.percentageBottle > 0 &&
             now - this.lastThrowTime > 800
         ) {
-            const bottle =
+            this.throwableObjects.push(
                 new ThrowableObject(
                     this.character.x + 100,
                     this.character.y + 100,
                     this
-                );
-
-            this.throwableObjects.push(bottle);
+                )
+            );
 
             this.lastThrowTime = now;
-
-            bottleBar.setPercentageBottle(
-                Math.max(
-                    bottleBar.percentageBottle - 20,
-                    0
-                )
+            bar.setPercentageBottle(
+                Math.max(bar.percentageBottle - 20, 0)
             );
         }
     }
 
-    /**
-     * Checks collisions between characters, enemies and bottles.
-     */
     checkCollisions() {
-        this.level.enemies.forEach(enemy => {
-            this.checkCharacterEnemyCollision(enemy);
-            this.checkBottleEnemyCollision(enemy);
+        this.level.enemies.forEach(e => {
+            this.checkCharacterEnemyCollision(e);
+            this.checkBottleEnemyCollision(e);
         });
 
         this.checkGameOver();
     }
 
-    /**
-     * Checks collision between character and enemy.
-     *
-     * @param {MovableObject} enemy - Enemy object.
-     */
     checkCharacterEnemyCollision(enemy) {
-        if (
-            !this.character.isColliding(enemy)
-        ) {
-            return;
-        }
+        if (!this.character.isColliding(enemy)) return;
 
-        if (enemy instanceof Chicken) {
-            this.handleChickenCollision(enemy);
-            return;
-        }
+        if (enemy instanceof Chicken)
+            return this.handleChickenCollision(enemy);
 
-        if (enemy instanceof Endboss) {
+        if (enemy instanceof Endboss)
             this.handleEndbossCollision(enemy);
-        }
     }
 
-    /**
-     * Handles collision between character and chicken.
-     *
-     * @param {Chicken} enemy - Chicken enemy.
-     */
     handleChickenCollision(enemy) {
-        if (
-            enemy.energy <= 0 ||
-            enemy.markedForDeletion
-        ) {
-            return;
-        }
+        if (enemy.energy <= 0 || enemy.markedForDeletion) return;
 
-        const characterBottom =
-            this.character.y +
-            this.character.height;
+        const bottom = this.character.y + this.character.height;
 
-        const isFallingOnChicken =
+        const falling =
             this.character.speedY < 0 &&
-            characterBottom <= enemy.y + 50;
+            bottom <= enemy.y + 50;
 
-        if (isFallingOnChicken) {
+        if (falling) {
             enemy.hit();
 
-            /**
-             * Places the character directly
-             * on top of the chicken.
-             */
             this.character.y =
-                enemy.y -
-                this.character.height;
+                enemy.y - this.character.height;
 
-            /**
-             * Do not create another jump.
-             */
             this.character.speedY = 0;
             this.character.isJumping = false;
 
-            if (window.gameAudio) {
-                window.gameAudio.play(0);
-            }
-
+            this.playSound(0);
             return;
         }
 
         const now = Date.now();
 
-        if (
-            now - this.lastCharacterHitTime >=
-            this.characterHitCooldown
-        ) {
+        if (now - this.lastCharacterHitTime >= this.characterHitCooldown) {
             this.lastCharacterHitTime = now;
-
             this.character.hit();
 
-            this.statusBars[0].setPercentage(
-                this.character.energy
-            );
+            this.statusBars[0]
+                .setPercentage(this.character.energy);
         }
     }
 
-    /**
-     * Handles collision between character and endboss.
-     *
-     * @param {Endboss} enemy - Endboss object.
-     */
     handleEndbossCollision(enemy) {
-        if (
-            enemy.isDead() ||
-            this.character.isDead()
-        ) {
-            return;
-        }
+        if (enemy.isDead() || this.character.isDead()) return;
 
         const now = Date.now();
 
-        if (
-            now - this.lastCharacterHitTime <
-            this.characterHitCooldown
-        ) {
+        if (now - this.lastCharacterHitTime < this.characterHitCooldown)
             return;
-        }
 
         this.lastCharacterHitTime = now;
 
-        /**
-         * The character loses only 10 health
-         * points per endboss collision.
-         */
         this.character.energy =
-            Math.max(
-                this.character.energy - 10,
-                0
-            );
+            Math.max(this.character.energy - 10, 0);
 
-        this.statusBars[0].setPercentage(
-            this.character.energy
-        );
+        this.statusBars[0]
+            .setPercentage(this.character.energy);
 
-        this.character.lastHit =
-            Date.now();
+        this.character.lastHit = Date.now();
 
-        if (
-            this.character.x <
-            enemy.x
-        ) {
+        if (this.character.x < enemy.x) {
             this.character.x -= 20;
             this.character.otherDirection = true;
         } else {
@@ -365,244 +210,75 @@ class World {
             this.character.otherDirection = false;
         }
 
-        if (window.gameAudio) {
-            window.gameAudio.play(0);
-        }
+        this.playSound(0);
     }
 
-    /**
-     * Checks bottle collisions with enemies.
-     *
-     * @param {MovableObject} enemy - Enemy object.
-     */
     checkBottleEnemyCollision(enemy) {
-        this.throwableObjects.forEach(
-            (bottle, index) => {
+        this.throwableObjects.forEach((bottle, i) => {
+            if (!bottle.isColliding(enemy)) return;
 
-                if (
-                    !bottle.isColliding(enemy)
-                ) {
-                    return;
-                }
+            if (enemy instanceof Endboss) {
+                enemy.hit();
 
-                if (enemy instanceof Endboss) {
-                    enemy.hit();
+                this.statusBars[3]
+                    .setPercentageEndboss(enemy.energy);
 
-                    this.statusBars[3]
-                        .setPercentageEndboss(
-                            enemy.energy
-                        );
-
-                    if (window.gameAudio) {
-                        window.gameAudio.play(4);
-                    }
-                } else {
-                    enemy.hit();
-                }
-
-                this.throwableObjects.splice(
-                    index,
-                    1
-                );
+                this.playSound(4);
+            } else {
+                enemy.hit();
             }
-        );
+
+            this.throwableObjects.splice(i, 1);
+        });
     }
 
-    /**
-     * Checks whether the character collects a coin.
-     *
-     * @param {Coins} coin - Coin object.
-     * @returns {boolean} True if the coin is collected.
-     */
-    isCollectingCoin(coin) {
-        const characterLeft =
-            this.character.x + 45;
-
-        const characterRight =
-            this.character.x +
-            this.character.width -
-            45;
-
-        const characterTop =
-            this.character.y + 70;
-
-        const characterBottom =
-            this.character.y +
-            this.character.height -
-            30;
-
-        const coinLeft =
-            coin.x + 35;
-
-        const coinRight =
-            coin.x +
-            coin.width -
-            35;
-
-        const coinTop =
-            coin.y + 35;
-
-        const coinBottom =
-            coin.y +
-            coin.height -
-            35;
-
-        return (
-            characterRight >= coinLeft &&
-            characterLeft <= coinRight &&
-            characterBottom >= coinTop &&
-            characterTop <= coinBottom
-        );
-    }
-
-    /**
-     * Checks whether the character collects coins.
-     */
     checkCoins() {
-        if (!this.level.coins) {
-            return;
-        }
+        if (!this.level.coins) return;
 
-        this.level.coins.forEach(
-            (coin, index) => {
+        this.level.coins.forEach((coin, i) => {
+            if (!this.isCollectingItem(coin)) return;
 
-                if (
-                    !this.isCollectingCoin(coin)
-                ) {
-                    return;
-                }
+            this.level.coins.splice(i, 1);
 
-                this.level.coins.splice(
-                    index,
-                    1
-                );
+            const bar = this.statusBars[2];
 
-                const coinBar =
-                    this.statusBars[2];
+            bar.setPercentageCoins(
+                Math.min(bar.percentageCoins + 20, 100)
+            );
 
-                const newCoins =
-                    Math.min(
-                        coinBar.percentageCoins + 20,
-                        100
-                    );
-
-                coinBar.setPercentageCoins(
-                    newCoins
-                );
-
-                if (window.gameAudio) {
-                    window.gameAudio.play(2);
-                }
-            }
-        );
+            this.playSound(2);
+        });
     }
 
-    /**
-     * Checks whether the character collects bottles.
-     */
     checkBottles() {
-        if (!this.level.bottles) {
-            return;
-        }
+        if (!this.level.bottles) return;
 
-        const bottleBar =
-            this.statusBars[1];
+        const bar = this.statusBars[1];
 
-        /**
-         * Do not collect any more bottles
-         * when the status bar is already full.
-         */
-        if (
-            bottleBar.percentageBottle >= 100
-        ) {
-            return;
-        }
+        if (bar.percentageBottle >= 100) return;
 
-        this.level.bottles.forEach(
-            (bottle, index) => {
+        this.level.bottles.forEach((bottle, i) => {
+            if (!this.isCollectingItem(bottle)) return;
 
-                if (
-                    !this.isCollectingItem(bottle)
-                ) {
-                    return;
-                }
+            this.level.bottles.splice(i, 1);
 
-                this.level.bottles.splice(
-                    index,
-                    1
-                );
+            bar.setPercentageBottle(
+                Math.min(bar.percentageBottle + 20, 100)
+            );
 
-                const newBottle =
-                    Math.min(
-                        bottleBar.percentageBottle + 20,
-                        100
-                    );
-
-                bottleBar.setPercentageBottle(
-                    newBottle
-                );
-
-                if (window.gameAudio) {
-                    window.gameAudio.play(2);
-                }
-            }
-        );
+            this.playSound(2);
+        });
     }
 
-    /**
-     * Checks whether the character collects an item.
-     *
-     * The collision area is intentionally smaller
-     * than the visible images to prevent the bottle
-     * from being collected too early.
-     *
-     * @param {MovableObject} item - Collectible item.
-     * @returns {boolean} True if the character touches the item.
-     */
     isCollectingItem(item) {
-        const characterLeft =
-            this.character.x + 35;
-
-        const characterRight =
-            this.character.x +
-            this.character.width -
-            35;
-
-        const characterTop =
-            this.character.y + 60;
-
-        const characterBottom =
-            this.character.y +
-            this.character.height -
-            25;
-
-        const itemLeft =
-            item.x + 15;
-
-        const itemRight =
-            item.x +
-            item.width -
-            15;
-
-        const itemTop =
-            item.y + 15;
-
-        const itemBottom =
-            item.y +
-            item.height -
-            15;
-
         return (
-            characterRight >= itemLeft &&
-            characterLeft <= itemRight &&
-            characterBottom >= itemTop &&
-            characterTop <= itemBottom
+            this.character.x + this.character.width - 35 >= item.x + 15 &&
+            this.character.x + 35 <= item.x + item.width - 15 &&
+            this.character.y + this.character.height - 25 >= item.y + 15 &&
+            this.character.y + 60 <= item.y + item.height - 15
         );
     }
 
-    /**
-     * Clears canvas and renders all game objects.
-     */
     draw() {
         this.ctx.clearRect(
             0,
@@ -611,148 +287,69 @@ class World {
             this.canvas.height
         );
 
-        this.ctx.translate(
-            this.camera_x,
-            0
-        );
+        this.ctx.translate(this.camera_x, 0);
 
-        this.addObjectsToMap(
-            this.level.backgroundObjects
-        );
+        this.addObjectsToMap(this.level.backgroundObjects);
+        this.addObjectsToMap(this.level.clouds);
 
-        this.addObjectsToMap(
-            this.level.clouds
-        );
+        this.ctx.translate(-this.camera_x, 0);
 
-        this.ctx.translate(
-            -this.camera_x,
-            0
-        );
-
-        this.addToMap(
-            this.statusBars[0]
-        );
-
-        this.addToMap(
-            this.statusBars[1]
-        );
-
-        this.addToMap(
-            this.statusBars[2]
-        );
+        this.addToMap(this.statusBars[0]);
+        this.addToMap(this.statusBars[1]);
+        this.addToMap(this.statusBars[2]);
 
         if (this.endbossTriggered) {
-            const endbossBar =
-                this.statusBars[3];
+            const bar = this.statusBars[3];
 
-            endbossBar.x =
-                this.canvas.width -
-                endbossBar.width -
-                10;
+            bar.x = this.canvas.width - bar.width - 10;
+            bar.y = 10;
 
-            endbossBar.y = 10;
-
-            this.addToMap(
-                endbossBar
-            );
+            this.addToMap(bar);
         }
 
-        this.ctx.translate(
-            this.camera_x,
-            0
-        );
+        this.ctx.translate(this.camera_x, 0);
 
-        this.addObjectsToMap(
-            this.level.enemies
-        );
+        this.addObjectsToMap(this.level.enemies);
 
-        if (this.level.coins) {
-            this.addObjectsToMap(
-                this.level.coins
-            );
-        }
+        if (this.level.coins)
+            this.addObjectsToMap(this.level.coins);
 
-        if (this.level.bottles) {
-            this.addObjectsToMap(
-                this.level.bottles
-            );
-        }
+        if (this.level.bottles)
+            this.addObjectsToMap(this.level.bottles);
 
-        this.addObjectsToMap(
-            this.throwableObjects
-        );
+        this.addObjectsToMap(this.throwableObjects);
+        this.addToMap(this.character);
 
-        this.addToMap(
-            this.character
-        );
+        this.ctx.translate(-this.camera_x, 0);
 
-        this.ctx.translate(
-            -this.camera_x,
-            0
-        );
-
-        requestAnimationFrame(
-            () => this.draw()
-        );
+        requestAnimationFrame(() => this.draw());
     }
 
-    /**
-     * Adds multiple objects to the map.
-     *
-     * @param {Array} objects - Objects to render.
-     */
     addObjectsToMap(objects) {
-        objects.forEach(object => {
-            this.addToMap(object);
-        });
+        objects.forEach(o => this.addToMap(o));
     }
 
-    /**
-     * Adds one object to the map.
-     *
-     * @param {DrawableObject} mo - Object to render.
-     */
     addToMap(mo) {
-        if (mo.otherDirection) {
+        if (mo.otherDirection)
             this.flipImage(mo);
-        }
 
         mo.draw(this.ctx);
 
-        if (mo.otherDirection) {
+        if (mo.otherDirection)
             this.flipImageBack(mo);
-        }
     }
 
-    /**
-     * Flips an image horizontally.
-     *
-     * @param {DrawableObject} mo - Object to flip.
-     */
     flipImage(mo) {
         this.ctx.save();
 
-        this.ctx.translate(
-            mo.width,
-            0
-        );
-
-        this.ctx.scale(
-            -1,
-            1
-        );
+        this.ctx.translate(mo.width, 0);
+        this.ctx.scale(-1, 1);
 
         mo.x *= -1;
     }
 
-    /**
-     * Restores the original image direction.
-     *
-     * @param {DrawableObject} mo - Object to restore.
-     */
     flipImageBack(mo) {
         mo.x *= -1;
-
         this.ctx.restore();
     }
 }

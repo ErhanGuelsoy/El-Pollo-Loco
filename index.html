@@ -1,733 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Pollo Loco</title>
+<link rel="icon" type="image/x-icon" href="img/5_background/complete_background.png">
+<link rel="stylesheet" href="style.css">
 
-    <title>El Pollo Loco</title>
-
-    <link
-        rel="icon"
-        type="image/x-icon"
-        href="img/5_background/complete_background.png"
-    >
-
-    <link rel="stylesheet" href="style.css">
-
-    <script src="models/keyboard.class.js"></script>
-    <script src="models/drawable-object.class.js"></script>
-    <script src="models/movable-object.class.js"></script>
-    <script src="models/coins.class.js"></script>
-    <script src="models/collect_bottle.class.js"></script>
-    <script src="models/character.class.js"></script>
-    <script src="models/chicken.class.js"></script>
-    <script src="models/cloud.class.js"></script>
-    <script src="models/status-bar.class.js"></script>
-    <script src="models/background-object.class.js"></script>
-    <script src="models/level.class.js"></script>
-    <script src="models/endboss.class.js"></script>
-    <script src="models/throwable-object.class.js"></script>
-    <script src="levels/level1.js"></script>
-    <script src="models/world.class.js"></script>
-    <script src="js/game_audio.class.js"></script>
-    <script src="js/game.js"></script>
-    <script src="models/keyboard-info.js"></script>
+<script src="models/keyboard.class.js"></script>
+<script src="models/drawable-object.class.js"></script>
+<script src="models/movable-object.class.js"></script>
+<script src="models/coins.class.js"></script>
+<script src="models/collect_bottle.class.js"></script>
+<script src="models/character.class.js"></script>
+<script src="models/chicken.class.js"></script>
+<script src="models/cloud.class.js"></script>
+<script src="models/status-bar.class.js"></script>
+<script src="models/background-object.class.js"></script>
+<script src="models/level.class.js"></script>
+<script src="models/endboss.class.js"></script>
+<script src="models/throwable-object.class.js"></script>
+<script src="levels/level1.js"></script>
+<script src="models/world.class.js"></script>
+<script src="js/game_audio.class.js"></script>
+<script src="js/game.js"></script>
+<script src="models/keyboard-info.js"></script>
 </head>
 
 <body onload="init()">
 
-    <div id="rotateDeviceOverlay">
-        <div class="rotate-device-box">
+<div id="rotateDeviceOverlay">
+<div class="rotate-device-box">
+<div class="rotate-phone"><div class="rotate-arrow">↻</div></div>
+<h2>Gerät drehen</h2>
+<p>Bitte drehe dein Smartphone oder Tablet ins Querformat, um El Pollo Loco zu spielen.</p>
+</div>
+</div>
 
-            <div class="rotate-phone">
-                <div class="rotate-arrow">↻</div>
-            </div>
+<h1>El Pollo Loco</h1>
 
-            <h2>Gerät drehen</h2>
+<div class="audio-control">
+<button id="outsideAudioBTN" class="outside-audio-btn">🔊</button>
+<span id="audioLabel">Mute</span>
+</div>
 
-            <p>
-                Bitte drehe dein Smartphone oder Tablet
-                ins Querformat, um El Pollo Loco zu spielen.
-            </p>
+<div id="gameContainer">
 
-        </div>
-    </div>
+<div class="game-area">
 
-    <h1>El Pollo Loco</h1>
+<div id="statusbar-container"></div>
 
-    <div class="audio-control">
+<div id="start_game">
+<img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="Startscreen">
+</div>
 
-        <button
-            id="outsideAudioBTN"
-            class="outside-audio-btn">
-            🔊
-        </button>
+<canvas id="canvas" width="720" height="480"></canvas>
 
-        <span id="audioLabel">
-            Mute
-        </span>
+<div id="winScreen" class="end-screen hidden">
+<img src="img/You won, you lost/You Win A.png" alt="You won">
+<div class="end-buttons">
+<button class="control-btn" onclick="restartGame()">↻</button>
+<button class="control-btn" onclick="backToMenu()">🏠</button>
+</div>
+</div>
 
-    </div>
+<div id="loseScreen" class="end-screen hidden">
+<img src="img/You won, you lost/You lost.png" alt="You lost">
+<div class="end-buttons">
+<button class="control-btn" onclick="restartGame()">↻</button>
+<button class="control-btn" onclick="backToMenu()">🏠</button>
+</div>
+</div>
 
-    <div id="gameContainer">
+<div id="playOverlay">
+<button id="startBTN" class="control-btn">▶</button>
+<span id="playLabel">Play</span>
+</div>
 
-        <div class="game-area">
+</div>
 
+<button id="keyboardInfoBTN" class="keyboard-info-btn">🎮 Tastenbelegung</button>
 
-            <div id="statusbar-container"></div>
+<div id="keyboardInfo" class="keyboard-info hidden">
+<div class="keyboard-info-box">
 
+<button id="closeKeyboardInfo" class="close-keyboard-btn">✕</button>
 
-            <div id="start_game">
+<h2>Tastenbelegung</h2>
 
-                <img
-                    src="img/9_intro_outro_screens/start/startscreen_1.png"
-                    alt="Startscreen"
-                >
+<div class="key-row"><div class="key">←</div><span>Nach links bewegen</span></div>
+<div class="key-row"><div class="key">→</div><span>Nach rechts bewegen</span></div>
+<div class="key-row"><div class="key">↑</div><span>Springen</span></div>
+<div class="key-row"><div class="key letter-key">D</div><span>Tabasco werfen</span></div>
 
-            </div>
+</div>
+</div>
 
+<div class="legal-buttons">
 
-            <canvas
-                id="canvas"
-                width="720"
-                height="480">
-            </canvas>
+<button id="imprintBTN" class="legal-btn">⚖ Impressum</button>
+<button id="privacyBTN" class="legal-btn">🔒 Datenschutz</button>
 
-            <div
-                id="winScreen"
-                class="end-screen hidden">
+</div>
 
-                <img
-                    src="img/You won, you lost/You Win A.png"
-                    alt="You won"
-                >
-
-                <div class="end-buttons">
-
-                    <button
-                        class="control-btn"
-                        onclick="restartGame()">
-                        ↻
-                    </button>
-
-                    <button
-                        class="control-btn"
-                        onclick="backToMenu()">
-                        🏠
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================================
-                 LOSE SCREEN
-                 ========================================= -->
-
-            <div
-                id="loseScreen"
-                class="end-screen hidden">
-
-                <img
-                    src="img/You won, you lost/You lost.png"
-                    alt="You lost"
-                >
-
-                <div class="end-buttons">
-
-                    <button
-                        class="control-btn"
-                        onclick="restartGame()">
-                        ↻
-                    </button>
-
-                    <button
-                        class="control-btn"
-                        onclick="backToMenu()">
-                        🏠
-                    </button>
-
-                </div>
-
-            </div>
-
-            <div id="playOverlay">
-
-                <button
-                    id="startBTN"
-                    class="control-btn">
-                    ▶
-                </button>
-
-                <span id="playLabel">
-                    Play
-                </span>
-
-            </div>
-
-        </div>
-
-        <button
-            id="keyboardInfoBTN"
-            class="keyboard-info-btn">
-
-            🎮 Tastenbelegung
-
-        </button>
-
-        <div
-            id="keyboardInfo"
-            class="keyboard-info hidden">
-
-            <div class="keyboard-info-box">
-
-                <button
-                    id="closeKeyboardInfo"
-                    class="close-keyboard-btn">
-                    ✕
-                </button>
-
-
-                <h2>
-                    Tastenbelegung
-                </h2>
-
-
-                <div class="key-row">
-
-                    <div class="key">
-                        ←
-                    </div>
-
-                    <span>
-                        Nach links bewegen
-                    </span>
-
-                </div>
-
-
-                <div class="key-row">
-
-                    <div class="key">
-                        →
-                    </div>
-
-                    <span>
-                        Nach rechts bewegen
-                    </span>
-
-                </div>
-
-
-                <div class="key-row">
-
-                    <div class="key">
-                        ↑
-                    </div>
-
-                    <span>
-                        Springen
-                    </span>
-
-                </div>
-
-
-                <div class="key-row">
-
-                    <div class="key letter-key">
-                        D
-                    </div>
-
-                    <span>
-                        Tabasco werfen
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =========================================
-             LEGAL BUTTONS
-             ========================================= -->
-
-        <div class="legal-buttons">
-
-            <button
-                id="imprintBTN"
-                class="legal-btn">
-
-                ⚖ Impressum
-
-            </button>
-
-
-            <button
-                id="privacyBTN"
-                class="legal-btn">
-
-                🔒 Datenschutz
-
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================================
-         IMPRESSUM
-         ========================================= -->
-
-    <div
-        id="imprintWindow"
-        class="legal-window hidden">
-
-        <div class="legal-box">
-
-            <button
-                id="closeImprint"
-                class="close-legal-btn">
-                ✕
-            </button>
-
-
-            <h2>
-                Impressum
-            </h2>
-
-
-            <h3>
-                Anbieter
-            </h3>
-
-
-            <p>
-                <strong>
-                    El Pollo Loco
-                </strong>
-            </p>
-
-
-            <p>
-                Erhan Gülsoy<br>
-                Grünmattstr. 20<br>
-                8405 Winterthur<br>
-                Schweiz
-            </p>
-
-
-            <h3>
-                Kontakt
-            </h3>
-
-
-            <p>
-
-                E-Mail:
-
-                <a href="mailto:erhan.guelsoy@developerakademie.com">
-                    erhan.guelsoy@developerakademie.com
-                </a>
-
-            </p>
-
-
-            <h3>
-                Über das Spiel
-            </h3>
-
-
-            <p>
-                El Pollo Loco ist ein 2D-Browsergame,
-                das im Rahmen meiner Ausbildung bei der
-                Developer Akademie als Lern- und
-                Portfolio-Projekt entwickelt wurde.
-            </p>
-
-
-            <h3>
-                Nutzungsbedingungen
-            </h3>
-
-
-            <p>
-                Die Nutzung des Spiels erfolgt auf eigene Verantwortung.
-                Das Spiel wird zu Lern- und Demonstrationszwecken bereitgestellt.
-            </p>
-
-
-            <p>
-                Eine Garantie für die jederzeitige Verfügbarkeit,
-                Fehlerfreiheit oder Funktionsfähigkeit des Spiels
-                wird nicht übernommen.
-            </p>
-
-
-            <h3>
-                Haftung
-            </h3>
-
-
-            <p>
-                Für Schäden, die durch die Nutzung oder Nichtnutzung
-                des Spiels entstehen, wird – soweit gesetzlich zulässig –
-                keine Haftung übernommen.
-            </p>
-
-
-            <h3>
-                Urheberrecht
-            </h3>
-
-
-            <p>
-                Die Inhalte und der Quellcode dieses Projekts sind,
-                soweit nicht anders gekennzeichnet, urheberrechtlich geschützt.
-            </p>
-
-
-            <p>
-                Eine Verwendung, Vervielfältigung oder Weitergabe
-                ohne entsprechende Zustimmung ist nicht gestattet,
-                soweit keine gesetzlichen Ausnahmen bestehen.
-            </p>
-
-
-            <p class="legal-date">
-                Stand: Juli 2026
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================================
-         DATENSCHUTZ
-         ========================================= -->
-
-    <div
-        id="privacyWindow"
-        class="legal-window hidden">
-
-        <div class="legal-box">
-
-            <button
-                id="closePrivacy"
-                class="close-legal-btn">
-                ✕
-            </button>
-
-
-            <h2>
-                Datenschutz
-            </h2>
-
-
-            <h3>
-                1. Verantwortlicher
-            </h3>
-
-
-            <p>
-                Verantwortlich für die Verarbeitung personenbezogener
-                Daten auf dieser Website ist:
-            </p>
-
-
-            <p>
-
-                <strong>
-                    Erhan Gülsoy
-                </strong>
-                <br>
-
-                Grünmattstr. 20
-                <br>
-
-                8405 Winterthur
-                <br>
-
-                Schweiz
-
-            </p>
-
-
-            <p>
-
-                E-Mail:
-
-                <a href="mailto:erhan.guelsoy@developerakademie.com">
-                    erhan.guelsoy@developerakademie.com
-                </a>
-
-            </p>
-
-
-            <h3>
-                2. Allgemeine Informationen
-            </h3>
-
-
-            <p>
-                Diese Website stellt das Browsergame
-                <strong>El Pollo Loco</strong> zur Verfügung.
-            </p>
-
-
-            <p>
-                Das Spiel wurde im Rahmen meiner Ausbildung
-                bei der Developer Akademie als Lern- und
-                Portfolio-Projekt entwickelt.
-            </p>
-
-
-            <h3>
-                3. Hosting durch GitHub Pages
-            </h3>
-
-
-            <p>
-                Diese Website wird über GitHub Pages,
-                einen Dienst der GitHub, Inc., bereitgestellt.
-            </p>
-
-
-            <p>
-                Beim Aufruf der Website können durch GitHub
-                technische Daten verarbeitet werden.
-                Dazu kann insbesondere die IP-Adresse
-                des Besuchers gehören.
-            </p>
-
-
-            <p>
-                Die Verarbeitung kann insbesondere der Sicherheit,
-                Stabilität und dem Schutz der GitHub-Infrastruktur
-                vor Missbrauch dienen.
-            </p>
-
-
-            <p>
-                Weitere Informationen findest du in der
-                Datenschutzerklärung von GitHub:
-            </p>
-
-
-            <p>
-
-                <a
-                    href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
-                    target="_blank"
-                    rel="noopener noreferrer">
-
-                    GitHub Datenschutzerklärung
-
-                </a>
-
-            </p>
-
-
-            <h3>
-                4. Zugriffsdaten
-            </h3>
-
-
-            <p>
-                Beim Besuch dieser Website können technisch
-                notwendige Informationen verarbeitet werden.
-                Dazu können insbesondere gehören:
-            </p>
-
-
-            <ul>
-
-                <li>
-                    IP-Adresse
-                </li>
-
-                <li>
-                    Datum und Uhrzeit des Zugriffs
-                </li>
-
-                <li>
-                    aufgerufene Website bzw. Ressourcen
-                </li>
-
-                <li>
-                    Informationen über das verwendete Gerät
-                </li>
-
-                <li>
-                    Informationen über den verwendeten Browser
-                </li>
-
-                <li>
-                    technische Verbindungs- und Sicherheitsinformationen
-                </li>
-
-            </ul>
-
-
-            <h3>
-                5. Cookies und Tracking
-            </h3>
-
-
-            <p>
-                Das Spiel El Pollo Loco verwendet selbst keine
-                Analyse- oder Marketingdienste wie Google Analytics
-                und keine personalisierten Werbedienste.
-            </p>
-
-
-            <p>
-                Das Spiel setzt selbst keine Cookies zu Analyse-
-                oder Werbezwecken.
-            </p>
-
-
-            <p>
-                GitHub kann im Rahmen des Betriebs seiner eigenen
-                Dienste Cookies oder ähnliche Technologien einsetzen.
-                Informationen hierzu findest du in den
-                Datenschutzbestimmungen von GitHub.
-            </p>
-
-
-            <h3>
-                6. Keine Registrierung
-            </h3>
-
-
-            <p>
-                Für die Nutzung von El Pollo Loco ist keine
-                Registrierung erforderlich.
-            </p>
-
-
-            <p>
-                Über das Spiel werden keine Benutzerkonten erstellt
-                und keine Passwörter abgefragt.
-            </p>
-
-
-            <h3>
-                7. Kontaktaufnahme
-            </h3>
-
-
-            <p>
-                Wenn du mich per E-Mail kontaktierst, werden die
-                von dir übermittelten Angaben verarbeitet,
-                um deine Anfrage zu bearbeiten und zu beantworten.
-            </p>
-
-
-            <p>
-
-                Kontakt:
-
-                <a href="mailto:erhan.guelsoy@developerakademie.com">
-                    erhan.guelsoy@developerakademie.com
-                </a>
-
-            </p>
-
-
-            <h3>
-                8. Externe Inhalte
-            </h3>
-
-
-            <p>
-                Das Spiel lädt die für die Funktion notwendigen
-                Dateien wie JavaScript-Dateien, Bilder,
-                Schriftdateien und Audiodateien direkt vom
-                eigenen GitHub-Pages-Projekt.
-            </p>
-
-
-            <p>
-                Nach aktuellem Stand werden keine externen
-                Analyse-, Werbe- oder Social-Media-Tracking-Dienste
-                in das Spiel eingebunden.
-            </p>
-
-
-            <h3>
-                9. Deine Rechte
-            </h3>
-
-
-            <p>
-                Du hast im Rahmen der anwendbaren
-                Datenschutzbestimmungen grundsätzlich Rechte
-                hinsichtlich deiner personenbezogenen Daten.
-            </p>
-
-
-            <ul>
-
-                <li>
-                    Auskunft über deine personenbezogenen Daten
-                </li>
-
-                <li>
-                    Berichtigung unrichtiger Daten
-                </li>
-
-                <li>
-                    Löschung deiner personenbezogenen Daten
-                </li>
-
-                <li>
-                    Einschränkung der Verarbeitung
-                </li>
-
-                <li>
-                    Widerspruch gegen bestimmte Verarbeitungen
-                </li>
-
-                <li>
-                    Übertragbarkeit deiner Daten,
-                    soweit gesetzlich vorgesehen
-                </li>
-
-            </ul>
-
-
-            <h3>
-                10. Änderungen
-            </h3>
-
-
-            <p>
-                Diese Datenschutzerklärung kann angepasst werden,
-                wenn sich die technische Umsetzung der Website
-                oder die verwendeten Dienste ändern.
-            </p>
-
-
-            <p>
-                Es gilt jeweils die zum Zeitpunkt des Besuchs
-                auf dieser Website veröffentlichte
-                Datenschutzerklärung.
-            </p>
-
-
-            <p class="legal-date">
-                Stand: Juli 2026
-            </p>
-
-        </div>
-
-    </div>
-
-</body>
-</html>
-
+</div>

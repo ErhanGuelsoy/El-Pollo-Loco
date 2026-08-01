@@ -144,9 +144,7 @@ function restartGame() {
     }
 
     stopAllSounds();
-
     keyboard = new Keyboard();
-
     const ctx = canvas.getContext("2d");
 
     ctx.clearRect(
@@ -158,12 +156,9 @@ function restartGame() {
 
     hideScreens();
     initLevel();
-
     gameAudio = new GameAudio();
     window.gameAudio = gameAudio;
-
     gameAudio.muteAll(isMuted);
-
     world = new World(canvas, keyboard);
 
     startBackgroundMusic();
@@ -310,7 +305,6 @@ function bindControlButtons() {
     bindJumpButton(jumpBTN);
     bindThrowButton(throwButton);
 }
-
 /**
  * Binds a movement button to a keyboard direction.
  * @param {HTMLElement|null} button
@@ -323,20 +317,16 @@ function bindMovementButton(button, direction) {
         e.preventDefault();
         keyboard[direction] = true;
     });
-
     button.addEventListener("pointerup", () => {
         keyboard[direction] = false;
     });
-
     button.addEventListener("pointercancel", () => {
         keyboard[direction] = false;
     });
-
     button.addEventListener("pointerleave", () => {
         keyboard[direction] = false;
     });
 }
-
 /**
  * Binds a button to the player's jump action.
  * @param {HTMLElement|null} button
@@ -350,20 +340,16 @@ function bindJumpButton(button) {
         keyboard.UP = true;
         triggerJump();
     });
-
     button.addEventListener("pointerup", () => {
         keyboard.UP = false;
     });
-
     button.addEventListener("pointercancel", () => {
         keyboard.UP = false;
     });
-
     button.addEventListener("pointerleave", () => {
         keyboard.UP = false;
     });
 }
-
 /**
  * Binds a button to the player's throw action.
  * @param {HTMLElement|null} button
@@ -376,15 +362,12 @@ function bindThrowButton(button) {
 
         keyboard.D = true;
     });
-
     button.addEventListener("pointerup", () => {
         keyboard.D = false;
     });
-
     button.addEventListener("pointercancel", () => {
         keyboard.D = false;
     });
-
     button.addEventListener("pointerleave", () => {
         keyboard.D = false;
     });
@@ -401,7 +384,6 @@ window.stopAllSounds = stopAllSounds;
 window.triggerJump = triggerJump;
 window.playEndbossSound = playEndbossSound;
 window.playCoinSound = playCoinSound;
-
 window.init = init;
 window.startGame = startGame;
 window.restartGame = restartGame;
