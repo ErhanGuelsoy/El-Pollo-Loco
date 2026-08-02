@@ -98,14 +98,18 @@ class World {
     handleEndboss() {
         const boss = this.level.enemies.find(e => e instanceof Endboss);
         if (!boss) return;
-
-        if (this.character.x >= 2000 && !this.endbossTriggered) {
+    
+        if (
+            !this.endbossTriggered &&
+            this.character.x + this.canvas.width >= boss.x
+        ) {
             this.endbossTriggered = true;
             boss.hadFirstContact = true;
         }
-
-        if (boss.energy <= 0 && !this.gameEnded)
+    
+        if (boss.energy <= 0 && !this.gameEnded) {
             this.endGame("winScreen");
+        }
     }
 
     checkThrowObjects() {
@@ -279,8 +283,10 @@ class World {
         );
 
         this.ctx.translate(this.camera_x, 0);
+
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
+
         this.ctx.translate(-this.camera_x, 0);
         this.addToMap(this.statusBars[0]);
         this.addToMap(this.statusBars[1]);
