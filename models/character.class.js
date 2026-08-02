@@ -4,7 +4,7 @@
 class Character extends MovableObject {
     height = 280;
     y = 360;
-    speed = 3;
+    speed = 4.2;
 
     /**
      * Exact Y position where the character stands on the ground.

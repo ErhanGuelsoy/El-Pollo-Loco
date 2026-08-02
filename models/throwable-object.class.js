@@ -1,4 +1,3 @@
-
 /**
  * Represents a throwable bottle that moves forward,
  * rotates in the air and is affected by gravity.
