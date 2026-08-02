@@ -143,62 +143,33 @@ isCollecting(mo) {
     );
 }
 
-    /**
-     * Precise collision detection for enemies.
-     *
-     * The character must actually land on the enemy.
-     * Small side overlaps are not enough.
-     *
-     * @param {MovableObject} mo - The enemy object.
-     * @returns {boolean} True if the character hits the enemy.
-     */
-    isEnemyCollision(mo) {
-        const characterOffsetX = 40;
-        const characterOffsetTop = 20;
-        const characterOffsetBottom = 5;
+  /**
+ * Precise collision detection for enemies.
+ *
+ * The collision boxes are reduced so that enemies only
+ * hit the character when the visible sprites actually touch.
+ *
+ * @param {MovableObject} mo - The enemy object.
+ * @returns {boolean} True if the objects collide.
+ */
+  isEnemyCollision(mo) {
+    const characterLeft = this.x + 25;
+    const characterRight = this.x + this.width - 25;
+    const characterTop = this.y + 30;
+    const characterBottom = this.y + this.height - 20;
 
-        const characterLeft =
-            this.x + characterOffsetX;
+    const enemyLeft = mo.x + 8;
+    const enemyRight = mo.x + mo.width - 8;
+    const enemyTop = mo.y + 5;
+    const enemyBottom = mo.y + mo.height - 5;
 
-        const characterRight =
-            this.x +
-            this.width -
-            characterOffsetX;
-
-        const characterTop =
-            this.y + characterOffsetTop;
-
-        const characterBottom =
-            this.y +
-            this.height -
-            characterOffsetBottom;
-
-        const enemyOffsetX = 10;
-        const enemyOffsetY = 5;
-
-        const enemyLeft =
-            mo.x + enemyOffsetX;
-
-        const enemyRight =
-            mo.x +
-            mo.width -
-            enemyOffsetX;
-
-        const enemyTop =
-            mo.y + enemyOffsetY;
-
-        const enemyBottom =
-            mo.y +
-            mo.height -
-            enemyOffsetY;
-
-        return (
-            characterLeft < enemyRight &&
-            characterRight > enemyLeft &&
-            characterTop < enemyBottom &&
-            characterBottom > enemyTop
-        );
-    }
+    return (
+        characterLeft < enemyRight &&
+        characterRight > enemyLeft &&
+        characterTop < enemyBottom &&
+        characterBottom > enemyTop
+    );
+}
 
     /**
      * Reduces the object's energy and applies knockback after taking damage.

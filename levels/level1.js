@@ -74,9 +74,6 @@ function initLevel() {
         new CollectBottle(1700, 350),
         new CollectBottle(1850, 190),
         new CollectBottle(2000, 280),
-        new CollectBottle(2150, 150),
-        new CollectBottle(2300, 330),
-        new CollectBottle(2450, 220)
 ]
     );
 }

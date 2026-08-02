@@ -146,13 +146,15 @@ class World {
     }
 
     checkCharacterEnemyCollision(enemy) {
-        if (!this.character.isColliding(enemy)) return;
-
-        if (enemy instanceof Chicken)
+        if (!this.character.isEnemyCollision(enemy)) return;
+    
+        if (enemy instanceof Chicken) {
             return this.handleChickenCollision(enemy);
-
-        if (enemy instanceof Endboss)
+        }
+    
+        if (enemy instanceof Endboss) {
             this.handleEndbossCollision(enemy);
+        }
     }
 
     handleChickenCollision(enemy) {
