@@ -231,21 +231,17 @@ class Endboss extends MovableObject {
         if (this.isAttacking || this.isDead()) {
             return;
         }
-
         if (Date.now() - this.lastAttackTime < 800) {
             return;
         }
 
         this.isAttacking = true;
         this.attackDamageApplied = false;
-
         this.playAnimation(this.IMAGES_ATTACK);
 
         setTimeout(() => {
-
             this.isAttacking = false;
             this.lastAttackTime = Date.now();
-
         }, 800);
     }
 

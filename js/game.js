@@ -145,6 +145,7 @@ function restartGame() {
 
     stopAllSounds();
     keyboard = new Keyboard();
+
     const ctx = canvas.getContext("2d");
 
     ctx.clearRect(
