@@ -42,18 +42,23 @@ class MovableObject extends DrawableObject {
      * @returns {boolean} True if the object is above the ground.
      */
     isAboveGround() {
+
         if (
             this instanceof ThrowableObject
         ) {
             return true;
         }
-
         if (
             this instanceof Character
         ) {
             return this.y < this.groundY;
         }
-
+    
+        if (
+            this instanceof Endboss
+        ) {
+            return this.y < this.groundY;
+        }
         return this.y < 180;
     }
 
@@ -115,10 +120,10 @@ class MovableObject extends DrawableObject {
  * @returns {boolean} True if the object is touched.
  */
 isCollecting(mo) {
-    const characterOffsetLeft = 55;
-    const characterOffsetRight = 55;
-    const characterOffsetTop = 45;
-    const characterOffsetBottom = 45;
+    const characterOffsetLeft = 40;
+    const characterOffsetRight = 40;
+    const characterOffsetTop = 35;
+    const characterOffsetBottom = 35;
 
     const characterLeft = this.x + characterOffsetLeft;
     const characterRight = this.x + this.width - characterOffsetRight;

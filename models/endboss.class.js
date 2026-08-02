@@ -2,22 +2,37 @@ class Endboss extends MovableObject {
 
     height = 400;
     width = 250;
-    y = 50;
+    groundY = 50;
+    y = -80;
+
+
     energy = 100;
-    speed = 2;
+    speed = 2.5;
 
     hadFirstContact = false;
+
     isAttacking = false;
+    isJumping = false;
+
     attackDamageApplied = false;
+
     lastAttackTime = 0;
+    attackCooldown = 1200;
+
+    lastJumpTime = 0;
+    jumpCooldown = 3000;
+
     lastBossHitTime = 0;
     bossHitCooldown = 250;
-    animationSpeed = 200;
+
+    animationSpeed = 180;
     lastAnimationTime = 0;
+
     deathAnimationStarted = false;
     deathAnimationFinished = false;
     deathAnimationStartTime = 0;
 
+    currentImage = 0;
 
     IMAGES_WALKING = [
         "img/4_enemie_boss_chicken/2_alert/G5.png",
@@ -59,77 +74,315 @@ class Endboss extends MovableObject {
         "img/4_enemie_boss_chicken/5_dead/G26.png"
     ];
 
-
     constructor() {
         super();
-
+    
         this.x = 2300;
-        this.currentImage = 0;
-
+        this.y = 0;
+    
         this.loadImage(this.IMAGES_ENDBOSS_WALK[0]);
-
+    
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_ENDBOSS_WALK);
         this.loadImages(this.IMAGES_ENDBOSS_DAMAGE);
         this.loadImages(this.IMAGES_ENDBOSS_DEATH);
-
+    
+        // Boss kann jetzt springen
+        this.applyGravity();
+    
         this.animate();
     }
 
-
     animate() {
+
         setInterval(() => {
 
+            if (!this.world) {
+                return;
+            }
+
+            if (this.world.gameEnded) {
+                return;
+            }
+
+
+            // Tod
             if (this.isDead()) {
                 this.handleDeathAnimation();
                 return;
             }
 
-            if (!this.world || !this.world.character || this.world.gameEnded) {
+
+            // Schaden Animation
+            if (this.isHurt()) {
+                this.playDamageAnimation();
                 return;
             }
 
-            if (!this.hadFirstContact) {
-                this.img = this.imageCache[this.IMAGES_ENDBOSS_WALK[0]];
-                return;
-            }
 
+            // Während Angriff nicht bewegen
             if (this.isAttacking) {
                 return;
             }
 
+
+            /**
+             * Boss startet erst nach Kontakt
+             */
+            if (!this.hadFirstContact) {
+
+                this.img =
+                    this.imageCache[
+                        this.IMAGES_ENDBOSS_WALK[0]
+                    ];
+
+                return;
+            }
+
+
+            const distance =
+                Math.abs(
+                    this.world.character.x - this.x
+                );
+
+
+            /**
+             * Sprungangriff
+             *
+             * Wenn Spieler mittlere Entfernung hat,
+             * springt der Boss auf ihn zu.
+             */
+            if (
+                distance > 180 &&
+                distance < 450 &&
+                Date.now() - this.lastJumpTime > this.jumpCooldown
+            ) {
+
+                this.jumpAttack();
+                return;
+            }
+
+
+            /**
+             * Nahkampf
+             */
             if (this.isCharacterInAttackRange()) {
+
                 this.startAttack();
                 return;
             }
 
+
+            /**
+             * Normal verfolgen
+             */
             this.followCharacter();
 
-            this.isHurt()
-                ? this.playDamageAnimation()
-                : this.playSlowAnimation(this.IMAGES_ENDBOSS_WALK);
+
+            this.playSlowAnimation(
+                this.IMAGES_ENDBOSS_WALK
+            );
+
 
         }, 1000 / 60);
     }
 
 
+
+    /**
+     * Prüft Entfernung zum Spieler
+     */
+    isCharacterInAttackRange() {
+
+        const character =
+            this.world.character;
+
+
+        const distance =
+            Math.abs(
+                (character.x + character.width / 2) -
+                (this.x + this.width / 2)
+            );
+
+
+        return distance <= 140;
+    }
+
+
+
+    /**
+     * Boss verfolgt den Charakter
+     */
+    followCharacter() {
+
+        const character =
+            this.world.character;
+
+
+        const distance =
+            character.x - this.x;
+
+
+        if (distance < -50) {
+
+            this.moveLeft();
+
+            this.otherDirection = false;
+        }
+
+
+        if (distance > 50) {
+
+            this.moveRight();
+
+            this.otherDirection = true;
+        }
+    }
+
+
+
+    /**
+     * Sprungangriff
+     */
+    jumpAttack() {
+
+        if (this.isJumping) {
+            return;
+        }
+
+
+        this.isJumping = true;
+
+
+        this.speedY = 25;
+
+
+        const character =
+            this.world.character;
+
+
+        if (character.x < this.x) {
+
+            this.x -= 100;
+
+            this.otherDirection = false;
+
+        } else {
+
+            this.x += 100;
+
+            this.otherDirection = true;
+        }
+
+
+
+        setTimeout(() => {
+
+            this.isJumping = false;
+
+            this.lastJumpTime =
+                Date.now();
+
+
+        }, 900);
+    }
+
+
+
+    /**
+     * Normaler Angriff
+     */
+    startAttack() {
+
+        if (this.isAttacking) {
+            return;
+        }
+
+
+        if (
+            Date.now() - this.lastAttackTime <
+            this.attackCooldown
+        ) {
+            return;
+        }
+
+
+        this.isAttacking = true;
+
+        this.attackDamageApplied = false;
+
+
+        this.currentImage = 0;
+
+
+        const attackInterval =
+            setInterval(() => {
+
+
+                if (!this.isAttacking) {
+
+                    clearInterval(
+                        attackInterval
+                    );
+
+                    return;
+                }
+
+
+                this.playAnimation(
+                    this.IMAGES_ATTACK
+                );
+
+
+            }, 100);
+
+
+
+        setTimeout(() => {
+
+
+            this.isAttacking = false;
+
+
+            this.lastAttackTime =
+                Date.now();
+
+
+            clearInterval(
+                attackInterval
+            );
+
+
+        }, 800);
+    }
+
     handleDeathAnimation() {
 
         this.isAttacking = false;
-        this.attackDamageApplied = false;
+        this.isJumping = false;
+
         this.speed = 0;
+
 
         if (!this.deathAnimationStarted) {
 
             this.deathAnimationStarted = true;
-            this.deathAnimationStartTime = Date.now();
+
+            this.deathAnimationStartTime =
+                Date.now();
+
 
             this.img =
-                this.imageCache[this.IMAGES_ENDBOSS_DEATH[0]];
+                this.imageCache[
+                    this.IMAGES_ENDBOSS_DEATH[0]
+                ];
+
 
             return;
         }
+
+
 
         if (this.deathAnimationFinished) {
 
@@ -140,160 +393,214 @@ class Endboss extends MovableObject {
                     ]
                 ];
 
+
             return;
         }
 
+
+
         const frame =
             Math.min(
+
                 Math.floor(
-                    (Date.now() - this.deathAnimationStartTime) / 180
+                    (
+                        Date.now() -
+                        this.deathAnimationStartTime
+                    ) / 250
                 ),
+
                 this.IMAGES_ENDBOSS_DEATH.length - 1
+
             );
 
-        if (frame === this.IMAGES_ENDBOSS_DEATH.length - 1) {
+
+
+        if (
+            frame ===
+            this.IMAGES_ENDBOSS_DEATH.length - 1
+        ) {
+
             this.deathAnimationFinished = true;
         }
 
+
+
         this.img =
-            this.imageCache[this.IMAGES_ENDBOSS_DEATH[frame]];
+            this.imageCache[
+                this.IMAGES_ENDBOSS_DEATH[frame]
+            ];
     }
 
 
+
+
+
+    /**
+     * Hurt Animation
+     */
     playDamageAnimation() {
+
 
         const frame =
             Math.min(
-                Math.floor((Date.now() - this.lastHit) / 80),
+
+                Math.floor(
+                    (
+                        Date.now() -
+                        this.lastHit
+                    ) / 100
+                ),
+
                 this.IMAGES_ENDBOSS_DAMAGE.length - 1
+
             );
 
+
+
         this.img =
-            this.imageCache[this.IMAGES_ENDBOSS_DAMAGE[frame]];
+            this.imageCache[
+                this.IMAGES_ENDBOSS_DAMAGE[frame]
+            ];
     }
 
 
+
+
+
+    /**
+     * Lauf Animation mit eigener Geschwindigkeit
+     */
     playSlowAnimation(images) {
 
-        if (Date.now() - this.lastAnimationTime >= this.animationSpeed) {
+
+        if (
+            Date.now() -
+            this.lastAnimationTime >=
+            this.animationSpeed
+        ) {
+
 
             this.currentImage++;
 
-            if (this.currentImage >= images.length) {
+
+            if (
+                this.currentImage >=
+                images.length
+            ) {
+
                 this.currentImage = 0;
             }
 
-            this.lastAnimationTime = Date.now();
+
+            this.lastAnimationTime =
+                Date.now();
         }
+
+
 
         this.img =
-            this.imageCache[images[this.currentImage]];
+            this.imageCache[
+                images[this.currentImage]
+            ];
     }
 
 
-    isCharacterInAttackRange() {
-
-        const character = this.world.character;
-
-        const distance =
-            Math.abs(
-                (character.x + character.width / 2) -
-                (this.x + this.width / 2)
-            );
-
-        return distance <= 140;
-    }
 
 
-    followCharacter() {
 
-        const character = this.world.character;
-
-        const distance =
-            (character.x + character.width / 2) -
-            (this.x + this.width / 2);
-
-
-        if (distance < -50) {
-            this.moveLeft();
-            this.otherDirection = false;
-        }
-
-        if (distance > 50) {
-            this.moveRight();
-            this.otherDirection = true;
-        }
-    }
-
-
-    startAttack() {
-
-        if (this.isAttacking || this.isDead()) {
-            return;
-        }
-        if (Date.now() - this.lastAttackTime < 800) {
-            return;
-        }
-
-        this.isAttacking = true;
-        this.attackDamageApplied = false;
-        this.playAnimation(this.IMAGES_ATTACK);
-
-        setTimeout(() => {
-            this.isAttacking = false;
-            this.lastAttackTime = Date.now();
-        }, 800);
-    }
-
-
+    /**
+     * Treffer vom Spieler
+     */
     hit() {
+
 
         if (this.isDead()) {
             return;
         }
 
-        if (Date.now() - this.lastBossHitTime < this.bossHitCooldown) {
+
+
+        if (
+            Date.now() -
+            this.lastBossHitTime <
+            this.bossHitCooldown
+        ) {
+
             return;
         }
 
-        this.lastBossHitTime = Date.now();
+
+
+        this.lastBossHitTime =
+            Date.now();
+
+
 
         this.energy -= 10;
 
+
+
         if (this.energy < 0) {
+
             this.energy = 0;
         }
 
-        this.lastHit = Date.now();
+
+
+        this.lastHit =
+            Date.now();
+
+
 
         this.isAttacking = false;
 
+
+
         this.deathAnimationStarted = false;
+
         this.deathAnimationFinished = false;
 
+
+
         if (window.gameAudio) {
+
             window.gameAudio.play(4);
         }
     }
-
-
     moveRight() {
 
-        if (!this.isDead()) {
-            this.x += this.speed;
+        if (this.isDead()) {
+            return;
         }
+
+
+        this.x += this.speed;
+
+        this.otherDirection = false;
     }
+
+
 
 
     moveLeft() {
 
-        if (!this.isDead()) {
-            this.x -= this.speed;
+        if (this.isDead()) {
+            return;
         }
+
+
+        this.x -= this.speed;
+
+        this.otherDirection = true;
     }
+
+
+
 
 
     isDead() {
+
         return this.energy <= 0;
     }
+
 }

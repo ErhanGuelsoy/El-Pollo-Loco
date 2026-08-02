@@ -12,6 +12,8 @@ function initLevel() {
             new Chicken(2400),
             new Chicken(3200),
             new Chicken(4100),
+            new Chicken(3200),
+            new Chicken(4100),
             new Chicken(5000),
             new Endboss()
         ],
@@ -63,6 +65,8 @@ function initLevel() {
 [
         new CollectBottle(200, 340),
         new CollectBottle(350, 180),
+        new CollectBottle(500, 310),
+        new CollectBottle(650, 230),
         new CollectBottle(500, 310),
         new CollectBottle(650, 230),
         new CollectBottle(800, 360),
