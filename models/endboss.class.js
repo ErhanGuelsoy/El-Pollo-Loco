@@ -9,14 +9,11 @@ class Endboss extends MovableObject {
     hadFirstContact = false;
     isAttacking = false;
     attackDamageApplied = false;
-
     lastAttackTime = 0;
     lastBossHitTime = 0;
     bossHitCooldown = 250;
-
     animationSpeed = 200;
     lastAnimationTime = 0;
-
     deathAnimationStarted = false;
     deathAnimationFinished = false;
     deathAnimationStartTime = 0;
