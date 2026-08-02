@@ -236,7 +236,7 @@ class World {
         if (!this.level.coins) return;
 
         this.level.coins.forEach((coin, i) => {
-            if (!this.isCollectingItem(coin)) return;
+            if (!this.character.isCollecting(coin)) return;
 
             this.level.coins.splice(i, 1);
 
@@ -258,7 +258,7 @@ class World {
         if (bar.percentageBottle >= 100) return;
 
         this.level.bottles.forEach((bottle, i) => {
-            if (!this.isCollectingItem(bottle)) return;
+            if (!this.character.isCollecting(bottle)) return;
 
             this.level.bottles.splice(i, 1);
 
@@ -270,15 +270,6 @@ class World {
         });
     }
 
-    isCollectingItem(item) {
-        return (
-            this.character.x + this.character.width - 35 >= item.x + 15 &&
-            this.character.x + 35 <= item.x + item.width - 15 &&
-            this.character.y + this.character.height - 25 >= item.y + 15 &&
-            this.character.y + 60 <= item.y + item.height - 15
-        );
-    }
-
     draw() {
         this.ctx.clearRect(
             0,
@@ -288,12 +279,9 @@ class World {
         );
 
         this.ctx.translate(this.camera_x, 0);
-
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
-
         this.ctx.translate(-this.camera_x, 0);
-
         this.addToMap(this.statusBars[0]);
         this.addToMap(this.statusBars[1]);
         this.addToMap(this.statusBars[2]);

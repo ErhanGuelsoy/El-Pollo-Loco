@@ -104,52 +104,44 @@ class MovableObject extends DrawableObject {
      * @param {MovableObject} mo - The collectible object.
      * @returns {boolean} True if the object is precisely touched.
      */
-    isCollecting(mo) {
-        const characterOffsetX = 35;
-        const characterOffsetY = 35;
+ /**
+ * Precise collision detection for collectible objects.
+ *
+ * The collision area of the character is reduced so that
+ * coins and bottles are only collected when the character
+ * actually touches them.
+ *
+ * @param {MovableObject} mo - The collectible object.
+ * @returns {boolean} True if the object is touched.
+ */
+isCollecting(mo) {
+    const characterOffsetLeft = 55;
+    const characterOffsetRight = 55;
+    const characterOffsetTop = 45;
+    const characterOffsetBottom = 45;
 
-        const characterLeft =
-            this.x + characterOffsetX;
+    const characterLeft = this.x + characterOffsetLeft;
+    const characterRight = this.x + this.width - characterOffsetRight;
+    const characterTop = this.y + characterOffsetTop;
+    const characterBottom = this.y + this.height - characterOffsetBottom;
 
-        const characterRight =
-            this.x +
-            this.width -
-            characterOffsetX;
+    const objectOffsetLeft = 18;
+    const objectOffsetRight = 18;
+    const objectOffsetTop = 18;
+    const objectOffsetBottom = 18;
 
-        const characterTop =
-            this.y + characterOffsetY;
+    const objectLeft = mo.x + objectOffsetLeft;
+    const objectRight = mo.x + mo.width - objectOffsetRight;
+    const objectTop = mo.y + objectOffsetTop;
+    const objectBottom = mo.y + mo.height - objectOffsetBottom;
 
-        const characterBottom =
-            this.y +
-            this.height -
-            characterOffsetY;
-
-        const objectOffsetX = 8;
-        const objectOffsetY = 8;
-
-        const objectLeft =
-            mo.x + objectOffsetX;
-
-        const objectRight =
-            mo.x +
-            mo.width -
-            objectOffsetX;
-
-        const objectTop =
-            mo.y + objectOffsetY;
-
-        const objectBottom =
-            mo.y +
-            mo.height -
-            objectOffsetY;
-
-        return (
-            characterLeft < objectRight &&
-            characterRight > objectLeft &&
-            characterTop < objectBottom &&
-            characterBottom > objectTop
-        );
-    }
+    return (
+        characterLeft < objectRight &&
+        characterRight > objectLeft &&
+        characterTop < objectBottom &&
+        characterBottom > objectTop
+    );
+}
 
     /**
      * Precise collision detection for enemies.
