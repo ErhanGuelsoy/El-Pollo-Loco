@@ -1778,9 +1778,6 @@ canvas {
 
 
 
-
-
-
 /* =========================================
    QUERFORMAT MOBILE
    ========================================= */
@@ -2122,5 +2119,82 @@ canvas {
 
     }
 
+
+}
+
+/* =========================================
+   MOBILE LEGAL BUTTONS AUSBLENDEN
+   ========================================= */
+
+   @media screen and (max-width:1024px) {
+
+    .legal-buttons {
+        display: none !important;
+    }
+
+}
+
+@media screen and (max-width:1024px) {
+
+    .keyboard-info-btn {
+        display:none !important;
+    }
+
+}
+
+/* MOBILE BUTTONS */
+
+.mobile-controls {
+
+    display:none;
+
+}
+
+
+@media screen and (max-width:1024px) {
+
+
+    .mobile-controls {
+
+        display:flex !important;
+
+        position:absolute;
+
+        bottom:-65px;
+
+        left:50%;
+
+        transform:translateX(-50%);
+
+        z-index:999999;
+
+        gap:8px;
+
+    }
+
+
+    .mobile-btn {
+
+        width:45px;
+
+        height:45px;
+
+        background:#d98c2b;
+
+        border:2px solid black;
+
+        border-radius:10px;
+
+        font-size:24px;
+
+        box-shadow:2px 2px 0 black;
+
+        display:flex;
+
+        justify-content:center;
+
+        align-items:center;
+
+    }
 
 }
