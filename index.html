@@ -10,16 +10,13 @@
 
     <title>El Pollo Loco</title>
 
-
     <link
         rel="icon"
         type="image/x-icon"
         href="img/5_background/complete_background.png"
     >
 
-
     <link rel="stylesheet" href="style.css">
-
 
     <script src="models/keyboard.class.js"></script>
     <script src="models/drawable-object.class.js"></script>
@@ -43,184 +40,94 @@
 
 </head>
 
-
-
 <body onload="init()">
 
-
-
-<div id="rotateDeviceOverlay">
-
-
-    <div class="rotate-device-box">
-
-
-        <div class="rotate-icon">
-
-
-            <div class="phone">
-
-                <div class="phone-screen"></div>
-
+    <div id="rotateDeviceOverlay">
+        <div class="rotate-device-box">
+    
+            <div class="rotate-icon">
+                <div class="phone">
+                    <div class="phone-screen"></div>
+                </div>
+    
+                <div class="rotate-symbol">↻</div>
             </div>
-
-
-            <div class="rotate-symbol">
-
-                ↻
-
-            </div>
-
-
+    
+            <h2>TURN YOUR DEVICE</h2>
+    
+            <p>
+                Bitte drehe dein Gerät ins Querformat,
+                damit du El Pollo Loco spielen kannst.
+            </p>
+    
+            <div class="rotate-hint">📱 → 🎮</div>
+    
         </div>
-
-
-
-        <h2>
-
-            TURN YOUR DEVICE
-
-        </h2>
-
-
-
-        <p>
-
-            Bitte drehe dein Gerät ins Querformat,
-            damit du El Pollo Loco spielen kannst.
-
-        </p>
-
-
-
-        <div class="rotate-hint">
-
-            📱 → 🎮
-
-        </div>
-
-
-
     </div>
-
-
-</div>
-
-
-
-
-
-<h1>
-
-    El Pollo Loco
-
-</h1>
-
-
-
-
-
-<div class="audio-control">
-
-
-    <button
-        id="outsideAudioBTN"
-        class="outside-audio-btn">
-
-        🔊
-
-    </button>
-
-
-
-    <span id="audioLabel">
-
-        Mute
-
-    </span>
-
-
-</div>
-
-
-
-
-
-<div id="gameContainer">
-
-
-
-    <div class="game-area">
-
-
-
-        <div id="statusbar-container"></div>
-
-
-
-
-
-        <div id="start_game">
-
-
-            <img
-
-                src="img/9_intro_outro_screens/start/startscreen_1.png"
-
-                alt="Startscreen"
-
-            >
-
-
-        </div>
-
-
-        <canvas
-
-            id="canvas"
-
-            width="720"
-
-            height="480">
-
-        </canvas>
-
-
-        <div
-
-            id="winScreen"
-
-            class="end-screen hidden">
-
-
-
-            <img
-
-                src="img/You won, you lost/You Win A.png"
-
-                alt="You won">
-
-
-
-
-
-            <div class="end-buttons">
-
-
-
-                <button
-
-                    class="control-btn"
-
-                    onclick="restartGame()">
-
-                    ↻
-
-
-                </button>
-
-
-
+    
+    
+    <h1>El Pollo Loco</h1>
+    
+    
+    <div class="audio-control">
+    
+        <button id="outsideAudioBTN" class="outside-audio-btn">
+            🔊
+        </button>
+    
+        <span id="audioLabel">Mute</span>
+    
+    </div>
+    
+    <div id="gameContainer">
+    
+        <div class="game-area">
+    
+            <div id="statusbar-container"></div>
+    
+    
+            <div id="start_game">
+                <img 
+                    src="img/9_intro_outro_screens/start/startscreen_1.png"
+                    alt="Startscreen">
+            </div>
+    
+    
+            <canvas id="canvas" width="720" height="480"></canvas>
+    
+    
+            <div id="winScreen" class="end-screen hidden">
+    
+                <img 
+                    src="img/You won, you lost/You Win A.png"
+                    alt="You won">
+    
+                <div class="end-buttons">
+    
+                    <button class="control-btn" onclick="restartGame()">
+                        ↻
+                    </button>
+    
+                    <button class="control-btn" onclick="backToMenu()">
+                        🏠
+                    </button>
+    
+                </div>
+    
+            </div>
+    
+    
+            <div id="loseScreen" class="end-screen hidden">
+    
+                <img 
+                    src="img/You won, you lost/You lost.png"
+                    alt="You lost">
+    
+                <div class="end-buttons">
+    
+                    <button class="control-btn" onclick="restartGame()">
+                        ↻
+                    </button>
 
 
                 <button
@@ -229,80 +136,12 @@
 
                     onclick="backToMenu()">
 
-
                     🏠
 
-
                 </button>
-
-
             </div>
 
-
-
         </div>
-
-
-
-
-
-        <div
-
-            id="loseScreen"
-
-            class="end-screen hidden">
-
-
-
-            <img
-
-                src="img/You won, you lost/You lost.png"
-
-                alt="You lost">
-
-
-
-
-
-            <div class="end-buttons">
-
-
-
-                <button
-
-                    class="control-btn"
-
-                    onclick="restartGame()">
-
-
-                    ↻
-
-
-                </button>
-
-
-
-
-
-                <button
-
-                    class="control-btn"
-
-                    onclick="backToMenu()">
-
-
-                    🏠
-
-
-                </button>
-
-
-            </div>
-
-
-
-        </div>
-
 
 
 <!-- HIER EINFÜGEN -->
@@ -327,11 +166,7 @@
 
 </div>
 
-
-
         <div id="playOverlay">
-
-
 
             <button
 
@@ -465,461 +300,141 @@
 
         </div>
 
-
-
-
         <div class="key-row">
-
-
-            <div class="key letter-key">
-
-                D
-
-            </div>
-
-
-            <span>
-
-                Tabasco werfen
-
-            </span>
-
-
+            <div class="key letter-key">D</div>
+            <span>Tabasco werfen</span>
         </div>
-
-
-
-    </div>
-
-
-</div>
-
-
-
-
-
-
-<div class="legal-buttons">
-
-
-    <button
-
-        id="imprintBTN"
-
-        class="legal-btn">
-
-
-        ⚖ Impressum
-
-
-    </button>
-
-
-
-
-
-    <button
-
-        id="privacyBTN"
-
-        class="legal-btn">
-
-
-        🔒 Datenschutz
-
-
-    </button>
-
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
-<div
-
-id="imprintWindow"
-
-class="legal-window hidden">
-
-
-
-<div class="legal-box">
-
-
-
-    <button
-
-        id="closeImprint"
-
-        class="close-legal-btn">
-
-
-        ✕
-
-
-    </button>
-
-
-
-
-    <h2>
-
-        Impressum
-
-    </h2>
-
-
-
-
-    <h3>
-
-        Anbieter
-
-    </h3>
-
-
-
-
-    <p>
-
-        <strong>
-
-            El Pollo Loco
-
-        </strong>
-
-    </p>
-
-
-
-
-    <p>
-
-        Erhan Gülsoy<br>
-
-        Grünmattstr. 20<br>
-
-        8405 Winterthur<br>
-
-        Schweiz
-
-    </p>
-
-
-
-
-    <h3>
-
-        Kontakt
-
-    </h3>
-
-
-
-
-    <p>
-
-        E-Mail:
-
-        <a href="mailto:erhan.guelsoy@developerakademie.com">
-
-            erhan.guelsoy@developerakademie.com
-
-        </a>
-
-
-    </p>
-
-
-
-
-    <h3>
-
-        Über das Spiel
-
-    </h3>
-
-
-
-
-    <p>
-
-        El Pollo Loco ist ein 2D-Browsergame,
-        das im Rahmen meiner Ausbildung bei der
-        Developer Akademie als Lern- und
-        Portfolio-Projekt entwickelt wurde.
-
-    </p>
-
-
-
-
-    <h3>
-
-        Nutzungsbedingungen
-
-    </h3>
-
-
-
-
-    <p>
-
-        Die Nutzung des Spiels erfolgt auf eigene Verantwortung.
-        Das Spiel wird zu Lern- und Demonstrationszwecken bereitgestellt.
-
-    </p>
-
-
-
-
-    <p>
-
-        Eine Garantie für die jederzeitige Verfügbarkeit,
-        Fehlerfreiheit oder Funktionsfähigkeit des Spiels
-        wird nicht übernommen.
-
-    </p>
-
-
-
-
-    <p class="legal-date">
-
-        Stand: Juli 2026
-
-    </p>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div
-
-id="privacyWindow"
-
-class="legal-window hidden">
-
-<div class="legal-box">
-
-
-
-    <button
-
-        id="closePrivacy"
-
-        class="close-legal-btn">
-
-
-        ✕
-
-
-    </button>
-
-
-
-
-    <h2>
-
-        Datenschutz
-
-    </h2>
-
-
-
-
-    <h3>
-
-        1. Verantwortlicher
-
-    </h3>
-
-
-
-
-    <p>
-
-        Verantwortlich für diese Website ist:
-
-    </p>
-
-
-
-
-    <p>
-
-        <strong>
-
-            Erhan Gülsoy
-
-        </strong>
-
-        <br>
-
-        Grünmattstr. 20
-
-        <br>
-
-        8405 Winterthur
-
-        <br>
-
-        Schweiz
-
-    </p>
-
-
-
-
-    <p>
-
-        E-Mail:
-
-        <a href="mailto:erhan.guelsoy@developerakademie.com">
-
-            erhan.guelsoy@developerakademie.com
-
-        </a>
-
-
-    </p>
-
-
-
-
-    <h3>
-
-        2. Allgemeine Informationen
-
-    </h3>
-
-
-
-
-    <p>
-
-        Diese Website stellt das Browsergame
-        El Pollo Loco zur Verfügung.
-
-    </p>
-
-
-
-
-    <p>
-
-        Das Spiel wurde als Lern- und
-        Portfolio-Projekt entwickelt.
-
-    </p>
-
-
-
-
-    <h3>
-
-        3. Hosting
-
-    </h3>
-
-
-
-
-    <p>
-
-        Diese Website wird über GitHub Pages bereitgestellt.
-
-    </p>
-
-
-
-
-    <h3>
-
-        4. Zugriffsdaten
-
-    </h3>
-
-
-
-
-    <p>
-
-        Technisch notwendige Daten können verarbeitet werden,
-        um Sicherheit und Stabilität der Website zu gewährleisten.
-
-    </p>
-
-
-
-
-    <h3>
-
-        5. Cookies und Tracking
-
-    </h3>
-
-
-
-
-    <p>
-
-        El Pollo Loco verwendet keine eigenen Analyse-
-        oder Marketingdienste.
-
-    </p>
-
-
-
-
-    <h3>
-
-        6. Kontakt
-
-    </h3>
-
-
-
-
-    <p>
-
-        Bei Kontaktaufnahme per E-Mail werden die Angaben
-        zur Bearbeitung der Anfrage verarbeitet.
-
-    </p>
-
-
-
-
-    <p class="legal-date">
-
-        Stand: Juli 2026
-
-    </p>
-
-
-
-</div>
-
-
-</div>
-
-
-</body>
-
-</html>
+        
+        </div>
+        </div>
+        
+        <div class="legal-buttons">
+            <button id="imprintBTN" class="legal-btn">⚖ Impressum</button>
+            <button id="privacyBTN" class="legal-btn">🔒 Datenschutz</button>
+        </div>
+        
+        </div>
+        
+        <div id="imprintWindow" class="legal-window hidden">
+            <div class="legal-box">
+                <button id="closeImprint" class="close-legal-btn">✕</button>
+        
+                <h2>Impressum</h2>
+        
+                <h3>Anbieter</h3>
+        
+                <p><strong>El Pollo Loco</strong></p>
+        
+                <p>
+                    Erhan Gülsoy<br>
+                    Grünmattstr. 20<br>
+                    8405 Winterthur<br>
+                    Schweiz
+                </p>
+        
+                <h3>Kontakt</h3>
+        
+                <p>
+                    E-Mail:
+                    <a href="mailto:erhan.guelsoy@developerakademie.com">
+                        erhan.guelsoy@developerakademie.com
+                    </a>
+                </p>
+        
+                <h3>Über das Spiel</h3>
+        
+                <p>
+                    El Pollo Loco ist ein 2D-Browsergame,
+                    das im Rahmen meiner Ausbildung bei der
+                    Developer Akademie als Lern- und
+                    Portfolio-Projekt entwickelt wurde.
+                </p>
+        
+                <h3>Nutzungsbedingungen</h3>
+        
+                <p>
+                    Die Nutzung des Spiels erfolgt auf eigene Verantwortung.
+                    Das Spiel wird zu Lern- und Demonstrationszwecken bereitgestellt.
+                </p>
+        
+                <p>
+                    Eine Garantie für die jederzeitige Verfügbarkeit,
+                    Fehlerfreiheit oder Funktionsfähigkeit des Spiels
+                    wird nicht übernommen.
+                </p>
+        
+                <p class="legal-date">Stand: Juli 2026</p>
+            </div>
+        </div>
+        
+        
+        <div id="privacyWindow" class="legal-window hidden">
+            <div class="legal-box">
+                <button id="closePrivacy" class="close-legal-btn">✕</button>
+        
+                <h2>Datenschutz</h2>
+        
+                <h3>1. Verantwortlicher</h3>
+        
+                <p>Verantwortlich für diese Website ist:</p>
+        
+                <p>
+                    <strong>Erhan Gülsoy</strong><br>
+                    Grünmattstr. 20<br>
+                    8405 Winterthur<br>
+                    Schweiz
+                </p>
+        
+                <p>
+                    E-Mail:
+                    <a href="mailto:erhan.guelsoy@developerakademie.com">
+                        erhan.guelsoy@developerakademie.com
+                    </a>
+                </p>
+        
+                <h3>2. Allgemeine Informationen</h3>
+        
+                <p>
+                    Diese Website stellt das Browsergame El Pollo Loco zur Verfügung.
+                </p>
+        
+                <p>
+                    Das Spiel wurde als Lern- und Portfolio-Projekt entwickelt.
+                </p>
+        
+                <h3>3. Hosting</h3>
+        
+                <p>
+                    Diese Website wird über GitHub Pages bereitgestellt.
+                </p>
+        
+                <h3>4. Zugriffsdaten</h3>
+        
+                <p>
+                    Technisch notwendige Daten können verarbeitet werden,
+                    um Sicherheit und Stabilität der Website zu gewährleisten.
+                </p>
+        
+                <h3>5. Cookies und Tracking</h3>
+        
+                <p>
+                    El Pollo Loco verwendet keine eigenen Analyse-
+                    oder Marketingdienste.
+                </p>
+        
+                <h3>6. Kontakt</h3>
+        
+                <p>
+                    Bei Kontaktaufnahme per E-Mail werden die Angaben
+                    zur Bearbeitung der Anfrage verarbeitet.
+                </p>
+        
+                <p class="legal-date">Stand: Juli 2026</p>
+            </div>
+        </div>
+        
+        </body>
+        </html>
+
+
+  
