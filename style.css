@@ -1032,117 +1032,143 @@ animation:popup .8s ease;
         float:right;
     }
 
-   @media screen and (orientation:portrait) and (max-width:1024px){
-    #rotateDeviceOverlay{
-    display:flex!important;
-    position:fixed;
-    inset:0;
-    z-index:9999;
-    justify-content:center;
-    align-items:center;
-    background:linear-gradient(135deg,rgba(0,0,0,.95),rgba(80,30,0,.95));
-    }
-    .game-area{display:none!important;}
-    h1{display:none!important;}
-    .audio-control{
-    display:flex!important;
-    position:fixed;
-    top:20px;
-    right:20px;
-    z-index:10000;
-    }
-    .keyboard-info-btn{
-    display:flex!important;
-    position:fixed;
-    bottom:20px;
-    left:20px;
-    z-index:10000;
-    }
-    .legal-buttons{
-    display:flex!important;
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    z-index:10000;
-    }
-    body{overflow:hidden;}
+    @media screen and (orientation:portrait) and (pointer:coarse){
+        #rotateDeviceOverlay{
+            display:flex;
+            position:fixed;
+            inset:0;
+            z-index:9999;
+            justify-content:center;
+            align-items:center;
+            background:linear-gradient(135deg,rgba(0,0,0,.95),rgba(80,30,0,.95));
+        }
+    
+        .game-area{display:none;}
+        h1{display:none;}
+    
+        .audio-control{
+            display:flex;
+            position:fixed;
+            top:20px;
+            right:20px;
+            z-index:10000;
+        }
+    
+        .keyboard-info-btn{
+            display:flex;
+            position:fixed;
+            bottom:20px;
+            left:20px;
+            z-index:10000;
+        }
+    
+        .legal-buttons{
+            display:flex;
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            z-index:10000;
+        }
+    
+        body{
+            overflow:hidden;
+        }
     }
     
-    @media screen and (orientation:landscape) and (max-height:600px){
-    .game-area{display:block!important;}
-    #gameContainer{display:flex!important;}
+    
+    @media screen and (orientation:landscape) and (pointer:coarse){
+        .game-area{display:block;}
+        #gameContainer{display:flex;}
     }
     
-    @media screen and (min-width:1025px){
-    .game-area{display:block!important;}
-    #gameContainer{display:flex!important;}
+    
+    @media screen and (pointer:fine){
+        .game-area{display:block;}
+        #gameContainer{display:flex;}
     }
+    
     
     @media screen and (max-height:700px){
-    h1{font-size:45px;}
-    canvas{max-height:65vh;}
+        h1{font-size:45px;}
+        canvas{max-height:65vh;}
     }
     
-    @media screen and (max-width:400px) and (orientation:portrait){
-    .game-area{display:block!important;}
-    #gameContainer{display:flex!important;}
-    h1{
-    display:block!important;
-    font-size:35px;
+    
+    /* Kleine Touch-Geräte */
+    @media screen and (max-width:400px) and (orientation:portrait) and (pointer:coarse){
+        .game-area{display:block;}
+        #gameContainer{display:flex;}
+    
+        h1{
+            display:block;
+            font-size:35px;
+        }
+    
+        .audio-control,
+        .keyboard-info-btn,
+        .legal-buttons{
+            position:static;
+            display:flex;
+        }
+    
+        canvas{
+            width:100vw;
+            height:auto;
+        }
     }
-    .audio-control,
-    .keyboard-info-btn,
-    .legal-buttons{
-    position:static;
-    display:flex!important;
-    }
-    canvas{
-    width:100vw;
-    height:auto;
-    }
-    }
+    
     
     @media screen and (max-width:450px){
-    .rotate-device-box{
-    width:90%;
-    padding:30px 20px;
-    }
-    .rotate-device-box h2{font-size:34px;}
-    .rotate-device-box p{font-size:15px;}
-    .rotate-hint{font-size:32px;}
-    .phone{left:calc(50% - 40px);}
-    .rotate-symbol{right:25px;font-size:55px;}
+        .rotate-device-box{
+            width:90%;
+            padding:30px 20px;
+        }
+    
+        .rotate-device-box h2{font-size:34px;}
+        .rotate-device-box p{font-size:15px;}
+        .rotate-hint{font-size:32px;}
+        .phone{left:calc(50% - 40px);}
+        .rotate-symbol{
+            right:25px;
+            font-size:55px;
+        }
     }
     
-    @media screen and (max-width:1024px){
-    .legal-buttons{display:none!important;}
-    .keyboard-info-btn{display:none!important;}
+    
+    /* Buttons nur auf Touch-Geräten ausblenden */
+    @media screen and (pointer:coarse){
+        .legal-buttons{display:none;}
+        .keyboard-info-btn{display:none;}
     }
+    
     
     .mobile-controls{
-    display:none;
+        display:none;
     }
     
-    @media screen and (max-width:1024px){
-    .mobile-controls{
-    display:flex!important;
-    position:absolute;
-    bottom:-65px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:999999;
-    gap:8px;
-    }
-    .mobile-btn{
-    width:45px;
-    height:45px;
-    background:#d98c2b;
-    border:2px solid black;
-    border-radius:10px;
-    font-size:24px;
-    box-shadow:2px 2px 0 black;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    }
+    
+    /* Mobile Controls nur auf Touch-Geräten */
+    @media screen and (pointer:coarse){
+        .mobile-controls{
+            display:flex;
+            position:absolute;
+            bottom:-65px;
+            left:50%;
+            transform:translateX(-50%);
+            z-index:999999;
+            gap:8px;
+        }
+    
+        .mobile-btn{
+            width:45px;
+            height:45px;
+            background:#d98c2b;
+            border:2px solid black;
+            border-radius:10px;
+            font-size:24px;
+            box-shadow:2px 2px 0 black;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
     }
