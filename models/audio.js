@@ -5,141 +5,127 @@ let gameAudio;
 let isMuted = false;
 
 /**
- * Initializes the game canvas and interface event listeners.
+ * Initializes the game interface and event listeners.
  */
 function init() {
     canvas = document.getElementById("canvas");
-
-    const startGameScreen =
-        document.getElementById("start_game");
-
-    const startButton =
-        document.getElementById("startBTN");
-
-    const outsideAudioBTN =
-        document.getElementById("outsideAudioBTN");
-
-    if (startGameScreen) {
-        startGameScreen.addEventListener(
-            "click",
-            startGame
-        );
-    }
-
-    if (startButton) {
-        startButton.addEventListener(
-            "click",
-            startGame
-        );
-    }
-
-    if (outsideAudioBTN) {
-        outsideAudioBTN.addEventListener(
-            "click",
-            () => {
-                if (!gameAudio) return;
-
-                isMuted = !isMuted;
-                gameAudio.muteAll(isMuted);
-
-                outsideAudioBTN.innerText =
-                    isMuted ? "🔇" : "🔊";
-
-                outsideAudioBTN.blur();
-            }
-        );
-    }
+    setupStartButtons();
 }
 
 /**
- * Starts a new game and initializes the game world and audio.
+ * Sets up the start and audio button event listeners.
+ */
+function setupStartButtons() {
+    const start = document.getElementById("start_game");
+    const button = document.getElementById("startBTN");
+    const audio = document.getElementById("outsideAudioBTN");
+
+    start?.addEventListener("click", startGame);
+    button?.addEventListener("click", startGame);
+    audio?.addEventListener("click", () => toggleMute(audio));
+}
+
+/**
+ * Toggles the game audio between muted and unmuted.
+ * @param {HTMLElement} button - The audio control button.
+ */
+function toggleMute(button) {
+    if (!gameAudio) return;
+
+    isMuted = !isMuted;
+    gameAudio.muteAll(isMuted);
+    button.innerText = isMuted ? "🔇" : "🔊";
+    button.blur();
+}
+
+/**
+ * Starts a new game and initializes its world and audio.
  */
 function startGame() {
-    document.getElementById(
-        "start_game"
-    ).style.display = "none";
-
-    document.getElementById(
-        "playOverlay"
-    ).style.display = "none";
-
-    document.getElementById(
-        "winScreen"
-    ).classList.add("hidden");
-
+    hideScreens();
     initLevel();
+    createGameAudio();
+    world = new World(canvas, keyboard);
+    startBackgroundMusic();
+    bindControlButtons();
+}
 
+/**
+ * Creates the game audio instance and applies the mute state.
+ */
+function createGameAudio() {
     gameAudio = new GameAudio();
     window.gameAudio = gameAudio;
 
     if (isMuted) {
         gameAudio.muteAll(true);
     }
+}
 
-    world = new World(
-        canvas,
-        keyboard
-    );
-
+/**
+ * Restarts the game and resets its world, keyboard and audio.
+ */
+function restartGame() {
+    resetGameWorld();
+    stopAudio();
+    resetCanvas();
+    keyboard = new Keyboard();
+    hideScreens();
+    initLevel();
+    createGameAudio();
+    world = new World(canvas, keyboard);
     startBackgroundMusic();
     bindControlButtons();
 }
 
 /**
- * Restarts the current game and resets the game world and audio.
+ * Ends the current game world and removes its reference.
  */
-function restartGame() {
+function resetGameWorld() {
     if (world) {
         world.gameEnded = true;
         world = null;
     }
-
-    stopAudio();
-
-    keyboard = new Keyboard();
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    document
-        .getElementById("winScreen")
-        .classList.add("hidden");
-
-    initLevel();
-
-    gameAudio = new GameAudio();
-    window.gameAudio = gameAudio;
-
-    if (isMuted) {
-        gameAudio.muteAll(true);
-    }
-
-    world = new World(
-        canvas,
-        keyboard
-    );
-
-    startBackgroundMusic();
-    bindControlButtons();
 }
 
 /**
- * Starts the background music and enables looping.
+ * Clears the game canvas.
+ */
+function resetCanvas() {
+    canvas.getContext("2d")
+        .clearRect(0, 0, canvas.width, canvas.height);
+}
+
+/**
+ * Hides the start, play and win screens.
+ */
+function hideScreens() {
+    document.getElementById("start_game").style.display = "none";
+    document.getElementById("playOverlay").style.display = "none";
+    hideWin();
+}
+
+/**
+ * Hides the win screen.
+ */
+function hideWin() {
+    document.getElementById("winScreen")
+        ?.classList.add("hidden");
+}
+
+/**
+ * Starts and configures the game's background music.
  */
 function startBackgroundMusic() {
-    const bgMusic = gameAudio.sounds[7];
+    const music = gameAudio.sounds[7];
 
-    bgMusic.loop = true;
-    bgMusic.volume = 0.4;
-    bgMusic.play().catch(() => {});
+    music.loop = true;
+    music.volume = 0.4;
+    music.play().catch(() => {});
 }
 
 /**
- * Stops all currently playing game sounds and resets their playback position.
+ * Stops all currently playing game sounds.
  */
 function stopAudio() {
     if (!gameAudio) return;

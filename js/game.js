@@ -1,3 +1,7 @@
+/**
+ * Global game variables for keyboard input, canvas,
+ * game world, audio and sound control.
+ */
 let keyboard = new Keyboard();
 let canvas;
 let world;
@@ -7,171 +11,143 @@ let canJumpSound = true;
 let canPlayCoinSound = true;
 
 /**
- * Initializes the game interface and event listeners.
+ * Initializes the game.
  */
 function init() {
     canvas = document.getElementById("canvas");
-
-    const startGameScreen = document.getElementById("start_game");
-    const startButton = document.getElementById("startBTN");
-    const outsideAudioBTN = document.getElementById("outsideAudioBTN");
-
+    setupStartButtons();
     updateMuteButton();
-
-    startGameScreen?.addEventListener("click", startGame);
-    startButton?.addEventListener("click", startGame);
-
-    outsideAudioBTN?.addEventListener("click", () => {
-        isMuted = !isMuted;
-
-        localStorage.setItem(
-            "elPolloLocoMuted",
-            isMuted
-        );
-
-        if (gameAudio) {
-            gameAudio.muteAll(isMuted);
-        }
-
-        updateMuteButton();
-        outsideAudioBTN.blur();
-    });
-
-    initImprint();
-    initPrivacy();
+    initModal("imprintBTN", "imprintWindow", "closeImprint");
+    initModal("privacyBTN", "privacyWindow", "closePrivacy");
 }
 
 /**
- * Updates the mute button according to the current mute state.
+ * Sets up the start screen buttons.
+ */
+function setupStartButtons() {
+    const screen = document.getElementById("start_game");
+    const start = document.getElementById("startBTN");
+    const audio = document.getElementById("outsideAudioBTN");
+    screen?.addEventListener("click", startGame);
+    start?.addEventListener("click", startGame);
+    audio?.addEventListener("click", toggleMute);
+}
+
+/**
+ * Toggles the mute state of the game audio.
+ */
+function toggleMute() {
+    isMuted = !isMuted;
+    localStorage.setItem("elPolloLocoMuted", isMuted);
+    gameAudio?.muteAll(isMuted);
+    updateMuteButton();
+    document.getElementById("outsideAudioBTN")?.blur();
+}
+
+/**
+ * Updates the mute button.
  */
 function updateMuteButton() {
-    const outsideAudioBTN = document.getElementById("outsideAudioBTN");
-    const audioLabel = document.getElementById("audioLabel");
-
-    if (!outsideAudioBTN) return;
-
-    outsideAudioBTN.innerText = isMuted ? "🔇" : "🔊";
-
-    if (audioLabel) {
-        audioLabel.innerText = isMuted ? "Unmute" : "Mute";
-    }
+    const button = document.getElementById("outsideAudioBTN");
+    const label = document.getElementById("audioLabel");
+    if (!button) return;
+    button.innerText = isMuted ? "🔇" : "🔊";
+    if (label) label.innerText = isMuted ? "Unmute" : "Mute";
 }
 
 /**
- * Initializes the imprint window and its event listeners.
+ * Initializes a modal window.
+ *
+ * @param {string} buttonId - ID of the open button.
+ * @param {string} windowId - ID of the modal window.
+ * @param {string} closeId - ID of the close button.
  */
-function initImprint() {
-    const imprintBTN = document.getElementById("imprintBTN");
-    const imprintWindow = document.getElementById("imprintWindow");
-    const closeImprint = document.getElementById("closeImprint");
-
-    imprintBTN?.addEventListener("click", () => {
-        imprintWindow.classList.remove("hidden");
-    });
-
-    closeImprint?.addEventListener("click", () => {
-        imprintWindow.classList.add("hidden");
-    });
-
-    imprintWindow?.addEventListener("click", e => {
-        if (e.target === imprintWindow) {
-            imprintWindow.classList.add("hidden");
-        }
-    });
+function initModal(buttonId, windowId, closeId) {
+    const button = document.getElementById(buttonId);
+    const modal = document.getElementById(windowId);
+    const close = document.getElementById(closeId);
+    button?.addEventListener("click", () => modal?.classList.remove("hidden"));
+    close?.addEventListener("click", () => modal?.classList.add("hidden"));
+    modal?.addEventListener("click", event => closeWindow(event, modal));
 }
 
 /**
- * Initializes the privacy policy window and its event listeners.
+ * Closes a modal window when clicking outside its content.
+ *
+ * @param {MouseEvent} event - Mouse event.
+ * @param {HTMLElement} modal - Modal window.
  */
-function initPrivacy() {
-    const privacyBTN = document.getElementById("privacyBTN");
-    const privacyWindow = document.getElementById("privacyWindow");
-    const closePrivacy = document.getElementById("closePrivacy");
-
-    privacyBTN?.addEventListener("click", () => {
-        privacyWindow.classList.remove("hidden");
-    });
-
-    closePrivacy?.addEventListener("click", () => {
-        privacyWindow.classList.add("hidden");
-    });
-
-    privacyWindow?.addEventListener("click", e => {
-        if (e.target === privacyWindow) {
-            privacyWindow.classList.add("hidden");
-        }
-    });
+function closeWindow(event, modal) {
+    if (event.target === modal) modal.classList.add("hidden");
 }
 
 /**
- * Starts a new game and initializes the game world and audio.
+ * Starts a new game and initializes its world and audio.
  */
 function startGame() {
     hideScreens();
     initLevel();
-
-    gameAudio = new GameAudio();
-    window.gameAudio = gameAudio;
-
-    gameAudio.muteAll(isMuted);
-
+    createGameAudio();
     world = new World(canvas, keyboard);
-
     startBackgroundMusic();
     bindControlButtons();
 }
 
 /**
- * Starts the game's background music.
+ * Creates the game audio instance.
  */
-function startBackgroundMusic() {
-    if (!gameAudio) return;
-
-    gameAudio.startMusic();
-
-    if (isMuted) {
-        gameAudio.muteAll(true);
-    }
+function createGameAudio() {
+    gameAudio = new GameAudio();
+    window.gameAudio = gameAudio;
+    gameAudio.muteAll(isMuted);
 }
 
 /**
- * Restarts the game and resets the game world, keyboard and audio.
+ * Starts background music.
+ */
+function startBackgroundMusic() {
+    if (!gameAudio) return;
+    gameAudio.startMusic();
+    if (isMuted) gameAudio.muteAll(true);
+}
+
+/**
+ * Restarts the game.
  */
 function restartGame() {
+    resetGameWorld();
+    resetCanvas();
+    hideScreens();
+    initLevel();
+    keyboard = new Keyboard();
+    createGameAudio();
+    world = new World(canvas, keyboard);
+    startBackgroundMusic();
+    bindControlButtons();
+}
+
+/**
+ * Resets the current game world.
+ */
+function resetGameWorld() {
     if (world) {
         world.gameEnded = true;
         world = null;
     }
-
+    resetMobileMovement();
     stopAllSounds();
-
-    keyboard = new Keyboard();
-
-    const ctx = canvas.getContext("2d");
-
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    hideScreens();
-    initLevel();
-
-    gameAudio = new GameAudio();
-    window.gameAudio = gameAudio;
-
-    gameAudio.muteAll(isMuted);
-
-    world = new World(canvas, keyboard);
-
-    startBackgroundMusic();
-    bindControlButtons();
 }
 
 /**
- * Hides the start, overlay, win and lose screens.
+ * Clears the game canvas.
+ */
+function resetCanvas() {
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+/**
+ * Hides all game screens.
  */
 function hideScreens() {
     document.getElementById("start_game").style.display = "none";
@@ -181,219 +157,249 @@ function hideScreens() {
 }
 
 /**
- * Stops all currently playing game sounds.
+ * Stops all game sounds.
  */
 function stopAllSounds() {
-    if (!gameAudio) return;
-
-    gameAudio.stopAll();
+    gameAudio?.stopAll();
 }
 
 /**
- * Plays the jump sound with a short cooldown.
+ * Plays the jump sound.
  */
 function triggerJump() {
-    if (!gameAudio || !canJumpSound) {
-        return;
-    }
-
+    if (!gameAudio || !canJumpSound) return;
     gameAudio.play(1);
     canJumpSound = false;
-
-    setTimeout(() => {
-        canJumpSound = true;
-    }, 300);
+    setTimeout(() => canJumpSound = true, 300);
 }
 
 /**
  * Plays the endboss sound.
  */
 function playEndbossSound() {
-    if (gameAudio) {
-        gameAudio.play(4);
-    }
+    gameAudio?.play(4);
 }
 
 /**
- * Plays the coin collection sound with a short cooldown.
+ * Plays the coin sound.
  */
 function playCoinSound() {
-    if (!gameAudio || !canPlayCoinSound) {
-        return;
-    }
-
+    if (!gameAudio || !canPlayCoinSound) return;
     gameAudio.play(2);
     canPlayCoinSound = false;
-
-    setTimeout(() => {
-        canPlayCoinSound = true;
-    }, 200);
+    setTimeout(() => canPlayCoinSound = true, 200);
 }
 
 /**
- * Handles keyboard input for player movement and actions.
- * @param {KeyboardEvent} e - The keyboard event.
+ * Handles keyboard input.
  */
 window.addEventListener("keydown", e => {
-    if (e.keyCode == 39) {
-        keyboard.RIGHT = true;
-    }
-
-    if (e.keyCode == 37) {
-        keyboard.LEFT = true;
-    }
-
-    if (e.keyCode == 38) {
-        keyboard.UP = true;
-    }
-
-    if (e.keyCode == 40) {
-        keyboard.DOWN = true;
-    }
-
-    if (e.keyCode == 32) {
-        e.preventDefault();
-
-        keyboard.SPACE = true;
-        keyboard.UP = true;
-
-        triggerJump();
-    }
-
-    if (e.keyCode == 68) {
-        keyboard.D = true;
-    }
+    handleMovementKeys(e);
+    handleActionKeys(e);
 });
 
 /**
- * Handles keyboard input when a key is released.
- * @param {KeyboardEvent} e
+ * Handles keyboard movement keys.
+ *
+ * @param {KeyboardEvent} e - Keyboard event.
+ */
+function handleMovementKeys(e) {
+    const keys = { 39: "RIGHT", 37: "LEFT", 38: "UP", 40: "DOWN" };
+    if (keys[e.keyCode]) keyboard[keys[e.keyCode]] = true;
+}
+
+/**
+ * Handles action-related keyboard input.
+ *
+ * @param {KeyboardEvent} e - Keyboard event.
+ */
+function handleActionKeys(e) {
+    if (e.keyCode === 32) handleJumpKey(e);
+    if (e.keyCode === 68) keyboard.D = true;
+}
+
+/**
+ * Handles the jump key.
+ *
+ * @param {KeyboardEvent} e - Keyboard event.
+ */
+function handleJumpKey(e) {
+    e.preventDefault();
+    keyboard.SPACE = true;
+    keyboard.UP = true;
+    triggerJump();
+}
+
+/**
+ * Handles released keyboard keys.
  */
 window.addEventListener("keyup", e => {
-    if (e.keyCode == 39) {
-        keyboard.RIGHT = false;
-    }
-
-    if (e.keyCode == 37) {
-        keyboard.LEFT = false;
-    }
-
-    if (e.keyCode == 38) {
-        keyboard.UP = false;
-    }
-
-    if (e.keyCode == 40) {
-        keyboard.DOWN = false;
-    }
-
-    if (e.keyCode == 32) {
-        keyboard.SPACE = false;
-        keyboard.UP = false;
-    }
-
-    if (e.keyCode == 68) {
-        keyboard.D = false;
-    }
+    const keys = { 39: "RIGHT", 37: "LEFT", 38: "UP", 40: "DOWN" };
+    if (keys[e.keyCode]) keyboard[keys[e.keyCode]] = false;
+    if (e.keyCode === 32) releaseJumpKey();
+    if (e.keyCode === 68) keyboard.D = false;
 });
 
 /**
- * Binds all mobile and touch control buttons to their actions.
+ * Releases the jump key.
+ */
+function releaseJumpKey() {
+    keyboard.SPACE = false;
+    keyboard.UP = false;
+}
+
+/**
+ * Binds all mobile control buttons.
  */
 function bindControlButtons() {
-    const btnLeft = document.getElementById("btnLeft");
-    const btnRight = document.getElementById("btnRight");
-    const jumpBTN = document.getElementById("jumpBTN");
-    const throwButton = document.getElementById("throw");
-
-    bindMovementButton(btnLeft, "LEFT");
-    bindMovementButton(btnRight, "RIGHT");
-    bindJumpButton(jumpBTN);
-    bindThrowButton(throwButton);
+    bindMovementButton(document.getElementById("leftBtn"), "LEFT");
+    bindMovementButton(document.getElementById("rightBtn"), "RIGHT");
+    bindJumpButton(document.getElementById("jumpBtn"));
+    bindThrowButton(document.getElementById("throwBtn"));
+    preventMobileContextMenu();
 }
 
 /**
- * Binds a movement button to a keyboard direction.
- * @param {HTMLElement|null} button
- * @param {string} direction
+ * Binds a mobile movement button.
+ *
+ * @param {HTMLElement} button - Movement button.
+ * @param {string} direction - Movement direction.
  */
 function bindMovementButton(button, direction) {
-    if (!button) return;
-
-    button.addEventListener("pointerdown", e => {
-        e.preventDefault();
-        keyboard[direction] = true;
-    });
-
-    button.addEventListener("pointerup", () => {
-        keyboard[direction] = false;
-    });
-
-    button.addEventListener("pointercancel", () => {
-        keyboard[direction] = false;
-    });
-
-    button.addEventListener("pointerleave", () => {
-        keyboard[direction] = false;
-    });
+    if (!button || button.dataset.bound) return;
+    button.dataset.bound = "true";
+    bindMovementEvents(button, direction);
 }
 
 /**
- * Binds a button to the player's jump action.
- * @param {HTMLElement|null} button
+ * Binds movement events to a mobile button.
+ *
+ * @param {HTMLElement} button - Movement button.
+ * @param {string} direction - Movement direction.
+ */
+function bindMovementEvents(button, direction) {
+    const start = event => startMovement(event, button, direction);
+    const stop = () => releaseMovement(button, direction);
+    button.addEventListener("pointerdown", start);
+    button.addEventListener("pointerup", stop);
+    button.addEventListener("pointercancel", stop);
+    button.addEventListener("lostpointercapture", stop);
+    button.addEventListener("mouseleave", stop);
+}
+
+/**
+ * Starts movement from a mobile button.
+ *
+ * @param {PointerEvent} event - Pointer event.
+ * @param {HTMLElement} button - Movement button.
+ * @param {string} direction - Movement direction.
+ */
+function startMovement(event, button, direction) {
+    event.preventDefault();
+    event.stopPropagation();
+    button.setPointerCapture(event.pointerId);
+    keyboard[direction] = true;
+    button.classList.add("active");
+}
+
+/**
+ * Releases a mobile movement button.
+ *
+ * @param {HTMLElement} button - Movement button.
+ * @param {string} direction - Movement direction.
+ */
+function releaseMovement(button, direction) {
+    keyboard[direction] = false;
+    button.classList.remove("active");
+}
+
+/**
+ * Resets mobile movement controls.
+ */
+function resetMobileMovement() {
+    keyboard.LEFT = false;
+    keyboard.RIGHT = false;
+    document.getElementById("leftBtn")?.classList.remove("active");
+    document.getElementById("rightBtn")?.classList.remove("active");
+}
+
+/**
+ * Prevents the mobile browser context menu.
+ */
+function preventMobileContextMenu() {
+    const controls = document.querySelector(".mobile-controls");
+    if (!controls || controls.dataset.contextMenuBound) return;
+    controls.dataset.contextMenuBound = "true";
+    controls.addEventListener("contextmenu", e => e.preventDefault());
+}
+
+/**
+ * Binds the jump button.
+ *
+ * @param {HTMLElement} button - Jump button.
  */
 function bindJumpButton(button) {
-    if (!button) return;
-
-    button.addEventListener("pointerdown", e => {
-        e.preventDefault();
-
-        keyboard.UP = true;
-        triggerJump();
-    });
-
-    button.addEventListener("pointerup", () => {
-        keyboard.UP = false;
-    });
-
-    button.addEventListener("pointercancel", () => {
-        keyboard.UP = false;
-    });
-
-    button.addEventListener("pointerleave", () => {
-        keyboard.UP = false;
-    });
+    if (!button || button.dataset.bound) return;
+    button.dataset.bound = "true";
+    bindActionButton(button, "UP");
 }
 
 /**
- * Binds a button to the player's throw action.
- * @param {HTMLElement|null} button
+ * Binds the throw button.
+ *
+ * @param {HTMLElement} button - Throw button.
  */
 function bindThrowButton(button) {
-    if (!button) return;
+    if (!button || button.dataset.bound) return;
+    button.dataset.bound = "true";
+    bindActionButton(button, "D");
+}
 
-    button.addEventListener("pointerdown", e => {
-        e.preventDefault();
-
-        keyboard.D = true;
+/**
+ * Binds an action button.
+ *
+ * @param {HTMLElement} button - Action button.
+ * @param {string} action - Keyboard action to activate.
+ */
+function bindActionButton(button, action) {
+    button.addEventListener("pointerdown", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        button.setPointerCapture(event.pointerId);
+        keyboard[action] = true;
+        if (action === "UP") triggerJump();
     });
+    bindActionRelease(button, action);
+}
 
-    button.addEventListener("pointerup", () => {
-        keyboard.D = false;
-    });
-
-    button.addEventListener("pointercancel", () => {
-        keyboard.D = false;
-    });
-
-    button.addEventListener("pointerleave", () => {
-        keyboard.D = false;
+/**
+ * Binds release events for an action button.
+ *
+ * @param {HTMLElement} button - Action button.
+ * @param {string} action - Keyboard action to release.
+ */
+function bindActionRelease(button, action) {
+    const release = event => {
+        event.preventDefault();
+        keyboard[action] = false;
+        if (button.hasPointerCapture(event.pointerId)) {
+            button.releasePointerCapture(event.pointerId);
+        }
+    };
+    button.addEventListener("pointerup", release);
+    button.addEventListener("pointercancel", release);
+    button.addEventListener("lostpointercapture", () => keyboard[action] = false);
+    button.addEventListener("contextmenu", event => {
+        event.preventDefault();
+        keyboard[action] = false;
     });
 }
 
 /**
- * Returns the player to the main menu.
+ * Returns to the main menu.
  */
 function backToMenu() {
+    resetMobileMovement();
     location.href = "index.html";
 }
 
@@ -401,7 +407,6 @@ window.stopAllSounds = stopAllSounds;
 window.triggerJump = triggerJump;
 window.playEndbossSound = playEndbossSound;
 window.playCoinSound = playCoinSound;
-
 window.init = init;
 window.startGame = startGame;
 window.restartGame = restartGame;

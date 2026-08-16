@@ -1,5 +1,6 @@
 /**
- * Represents a status bar for health, bottles, coins or the endboss.
+ * Represents a status bar for health, bottles,
+ * coins or the endboss.
  */
 class StatusBar extends DrawableObject {
 
@@ -46,7 +47,7 @@ class StatusBar extends DrawableObject {
     type = "health";
 
     /**
-     * Creates a new status bar.
+     * Creates a status bar and sets its position and value.
      * @param {string} type - The type of status bar.
      * @param {number} y - The vertical position.
      */
@@ -54,200 +55,128 @@ class StatusBar extends DrawableObject {
         super();
 
         this.type = type;
-
         this.width = 250;
         this.height = 80;
 
-        if (
-            this.type === "health" ||
-            this.type === "bottle" ||
-            this.type === "coins"
-        ) {
-            this.x = 10;
-            this.y = y;
-        }
+        this.setPosition(y);
+        this.loadAllImages();
+        this.setInitialPercentage();
+    }
 
+    /**
+     * Sets the position of the status bar.
+     * @param {number} y - The vertical position.
+     */
+    setPosition(y) {
         if (this.type === "endboss") {
             this.x = 460;
             this.y = 10;
+            return;
         }
 
+        this.x = 10;
+        this.y = y;
+    }
+
+    /**
+     * Loads all status bar image sets.
+     */
+    loadAllImages() {
         this.loadImages(this.IMAGES_Statusbar_Health);
         this.loadImages(this.IMAGES_Statusbar_Bottle);
         this.loadImages(this.IMAGES_Statusbar_Coins);
         this.loadImages(this.IMAGES_Statusbar_Endboss);
-
-        if (this.type === "health") {
-            this.setPercentage(100);
-        }
-
-        if (this.type === "bottle") {
-            this.setPercentageBottle(0);
-        }
-
-        if (this.type === "coins") {
-            this.setPercentageCoins(0);
-        }
-
-        if (this.type === "endboss") {
-            this.setPercentageEndboss(100);
-        }
     }
 
     /**
-     * Sets the health percentage.
-     * @param {number} percentage - Current health.
+     * Sets the initial percentage according to the bar type.
+     */
+    setInitialPercentage() {
+        if (this.type === "health") this.setPercentage(100);
+        if (this.type === "bottle") this.setPercentageBottle(0);
+        if (this.type === "coins") this.setPercentageCoins(0);
+        if (this.type === "endboss") this.setPercentageEndboss(100);
+    }
+
+    /**
+     * Updates the health status bar percentage.
+     * @param {number} percentage - Current health percentage.
      */
     setPercentage(percentage) {
         this.percentage = percentage;
+        this.updateImage(
+            this.IMAGES_Statusbar_Health,
+            percentage
+        );
+    }
 
-        const path =
-            this.IMAGES_Statusbar_Health[
-                this.resolveImageIndex()
-            ];
+    /**
+     * Determines the image index for a percentage.
+     * @param {number} percentage - Current percentage.
+     * @returns {number} The matching image index.
+     */
+    resolveImageIndex(percentage) {
+        if (percentage <= 0) return 0;
+    
+        return Math.ceil(percentage / 20);
+    }
+
+    /**
+     * Updates the status bar image.
+     * @param {string[]} images - The image sequence.
+     * @param {number} percentage - Current percentage.
+     */
+    updateImage(images, percentage) {
+        const index = this.resolveImageIndex(percentage);
+        const path = images[index];
 
         this.img = this.imageCache[path];
     }
 
     /**
-     * Determines health image index.
-     * @returns {number} Image index.
-     */
-    resolveImageIndex() {
-        if (this.percentage >= 100) {
-            return 5;
-        } else if (this.percentage >= 80) {
-            return 4;
-        } else if (this.percentage >= 60) {
-            return 3;
-        } else if (this.percentage >= 40) {
-            return 2;
-        } else if (this.percentage >= 20) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Sets the bottle percentage.
+     * Updates the bottle status bar percentage.
      * @param {number} percentageBottle - Current bottle percentage.
      */
     setPercentageBottle(percentageBottle) {
         this.percentageBottle = percentageBottle;
-
-        const path =
-            this.IMAGES_Statusbar_Bottle[
-                this.resolveImageIndexBottle()
-            ];
-
-        this.img = this.imageCache[path];
+        this.updateImage(
+            this.IMAGES_Statusbar_Bottle,
+            percentageBottle
+        );
     }
 
-    /**
-     * Determines bottle image index.
-     * @returns {number} Image index.
-     */
-    resolveImageIndexBottle() {
-        if (this.percentageBottle >= 100) {
-            return 5;
-        } else if (this.percentageBottle >= 80) {
-            return 4;
-        } else if (this.percentageBottle >= 60) {
-            return 3;
-        } else if (this.percentageBottle >= 40) {
-            return 2;
-        } else if (this.percentageBottle >= 20) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
+ /**
+  * Updates the coin status bar percentage.
+  * @param {number} percentageCoins - Current coin percentage.
+  */
+ setPercentageCoins(percentageCoins) {
+    this.percentageCoins = Math.min(percentageCoins, 100);
+
+    this.updateImage(
+        this.IMAGES_Statusbar_Coins,
+        this.percentageCoins
+    );
+}
 
     /**
-     * Sets the coin percentage.
-     * @param {number} percentageCoins - Current coin percentage.
-     */
-    setPercentageCoins(percentageCoins) {
-        this.percentageCoins = percentageCoins;
-
-        const path =
-            this.IMAGES_Statusbar_Coins[
-                this.resolveImageIndexCoins()
-            ];
-
-        this.img = this.imageCache[path];
-    }
-
-    /**
-     * Determines coin image index.
-     * @returns {number} Image index.
-     */
-    resolveImageIndexCoins() {
-        if (this.percentageCoins >= 100) {
-            return 5;
-        } else if (this.percentageCoins >= 80) {
-            return 4;
-        } else if (this.percentageCoins >= 60) {
-            return 3;
-        } else if (this.percentageCoins >= 40) {
-            return 2;
-        } else if (this.percentageCoins >= 20) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Sets the endboss percentage.
-     * @param {number} percentageEndboss - Current endboss percentage.
+     * Updates the endboss status bar percentage.
+     * @param {number} percentageEndboss - Current boss percentage.
      */
     setPercentageEndboss(percentageEndboss) {
         this.percentageEndboss = percentageEndboss;
-
-        const path =
-            this.IMAGES_Statusbar_Endboss[
-                this.resolveImageIndexEndboss()
-            ];
-
-        this.img = this.imageCache[path];
+        this.updateImage(
+            this.IMAGES_Statusbar_Endboss,
+            percentageEndboss
+        );
     }
 
     /**
-     * Determines endboss image index.
-     * @returns {number} Image index.
-     */
-    resolveImageIndexEndboss() {
-        if (this.percentageEndboss >= 100) {
-            return 5;
-        } else if (this.percentageEndboss >= 80) {
-            return 4;
-        } else if (this.percentageEndboss >= 60) {
-            return 3;
-        } else if (this.percentageEndboss >= 40) {
-            return 2;
-        } else if (this.percentageEndboss >= 20) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Reduces the endboss percentage by 20.
+     * Reduces the endboss percentage by 20 points.
      */
     reduceEndboss() {
-        if (this.percentageEndboss >= 100) {
-            this.setPercentageEndboss(80);
-        } else if (this.percentageEndboss >= 80) {
-            this.setPercentageEndboss(60);
-        } else if (this.percentageEndboss >= 60) {
-            this.setPercentageEndboss(40);
-        } else if (this.percentageEndboss >= 40) {
-            this.setPercentageEndboss(20);
-        } else if (this.percentageEndboss >= 20) {
-            this.setPercentageEndboss(0);
-        }
+        this.setPercentageEndboss(
+            Math.max(0, this.percentageEndboss - 20)
+        );
     }
 }
+

@@ -1,3 +1,6 @@
+/**
+ * Represents the current state of the keyboard controls.
+ */
 class Keyboard {
     LEFT = false;
     RIGHT = false;

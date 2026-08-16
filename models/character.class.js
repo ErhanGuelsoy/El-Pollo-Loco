@@ -1,19 +1,12 @@
 /**
- * Represents the playable character and controls movement, animation and health.
+ * Represents the playable character and controls movement,
+ * animation and health.
  */
 class Character extends MovableObject {
     height = 280;
-    y = 180;
-    speed = 3;
-
-    /**
-     * Exact Y position where the character stands on the ground.
-     */
-    groundY = 180;
-
-    /**
-     * Stores whether the character is currently jumping.
-     */
+    y = 360;
+    speed = 4.2;
+    groundY = 150;
     isJumping = false;
 
     IMAGES_WALKING = [
@@ -79,151 +72,166 @@ class Character extends MovableObject {
      */
     constructor() {
         super();
-
         this.x = 150;
         this.y = this.groundY;
         this.speedY = 0;
         this.isJumping = false;
 
-        this.loadImage(this.IMAGES_IDLE[0]);
-
-        this.loadImages(this.IMAGES_WALKING);
-        this.loadImages(this.IMAGES_JUMPING);
-        this.loadImages(this.IMAGES_DEAD);
-        this.loadImages(this.IMAGES_HURT);
-        this.loadImages(this.IMAGES_IDLE);
-
+        this.loadCharacterImages();
         this.applyGravity();
         this.animate();
     }
 
     /**
-     * Handles character movement, jumping, camera position
-     * and animations.
+     * Loads all character animation image sets.
+     */
+    loadCharacterImages() {
+        this.loadImage(this.IMAGES_IDLE[0]);
+        this.loadImages(this.IMAGES_WALKING);
+        this.loadImages(this.IMAGES_JUMPING);
+        this.loadImages(this.IMAGES_DEAD);
+        this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_IDLE);
+    }
+
+    /**
+     * Starts the movement and animation intervals.
      */
     animate() {
+        this.animateMovement();
+        this.animateCharacter();
+    }
 
-        /**
-         * Character movement.
-         */
+    /**
+     * Handles character movement and camera position.
+     */
+    animateMovement() {
         setInterval(() => {
-
             if (!this.world) return;
-
             if (this.world.gameEnded) {
-                this.world.keyboard.LEFT = false;
-                this.world.keyboard.RIGHT = false;
-                this.world.keyboard.UP = false;
-                this.world.keyboard.DOWN = false;
-                this.world.keyboard.SPACE = false;
-                this.world.keyboard.D = false;
-
+                this.resetControls();
                 return;
             }
 
-            if (
-                this.world.keyboard.RIGHT &&
-                this.x < this.world.level.level_end_x
-            ) {
-                this.moveRight();
-                this.otherDirection = false;
-            }
-
-            if (
-                this.world.keyboard.LEFT &&
-                this.x > 0
-            ) {
-                this.moveLeft();
-                this.otherDirection = true;
-            }
-
-            if (
-                this.world.keyboard.UP &&
-                !this.isJumping &&
-                this.y >= this.groundY
-            ) {
-                this.jump();
-            }
-
-            this.world.camera_x =
-                -this.x + this.world.canvas.width / 4;
-
+            this.handleMovement();
+            this.updateCamera();
         }, 1000 / 60);
+    }
 
-        /**
-         * Character animations.
-         */
+    /**
+     * Resets all keyboard controls when the game ends.
+     */
+    resetControls() {
+        const keyboard = this.world.keyboard;
+
+        keyboard.LEFT = false;
+        keyboard.RIGHT = false;
+        keyboard.UP = false;
+        keyboard.DOWN = false;
+        keyboard.SPACE = false;
+        keyboard.D = false;
+    }
+
+    /**
+     * Handles horizontal movement and jumping.
+     */
+    handleMovement() {
+        this.handleRightMovement();
+        this.handleLeftMovement();
+        this.handleJump();
+    }
+
+    /**
+     * Moves the character to the right when possible.
+     */
+    handleRightMovement() {
+        if (this.world.keyboard.RIGHT &&
+            this.x < this.world.level.level_end_x) {
+            this.moveRight();
+        }
+    }
+
+    /**
+     * Moves the character to the left when possible.
+     */
+    handleLeftMovement() {
+        if (this.world.keyboard.LEFT && this.x > 0) {
+            this.moveLeft();
+        }
+    }
+
+    /**
+     * Starts a jump when the character is on the ground.
+     */
+    handleJump() {
+        if (this.world.keyboard.UP &&
+            !this.isJumping &&
+            this.y >= this.groundY) {
+            this.jump();
+        }
+    }
+
+    /**
+     * Updates the camera position based on the character.
+     */
+    updateCamera() {
+        this.world.camera_x =
+            -this.x + this.world.canvas.width / 4;
+    }
+
+    /**
+     * Handles the character animation states.
+     */
+    animateCharacter() {
         setInterval(() => {
-
-            if (!this.world) return;
-
-            /**
-             * Completely freeze the character animation
-             * when the game has ended.
-             */
-            if (this.world.gameEnded) {
-                return;
-            }
-
-            /**
-             * Death animation.
-             */
-            if (this.isDead()) {
-                this.playAnimation(this.IMAGES_DEAD);
-                return;
-            }
-
-            /**
-             * Hurt animation.
-             */
-            if (this.isHurt()) {
-                this.playAnimation(this.IMAGES_HURT);
-                return;
-            }
-
-            /**
-             * Jump animation.
-             */
-            if (this.isJumping) {
-                this.playAnimation(this.IMAGES_JUMPING);
-                return;
-            }
-
-            /**
-             * Walking animation.
-             */
-            if (
-                this.world.keyboard.LEFT ||
-                this.world.keyboard.RIGHT
-            ) {
-                this.playAnimation(this.IMAGES_WALKING);
-                return;
-            }
-
-            /**
-             * Idle animation.
-             */
-            this.playAnimation(this.IMAGES_IDLE);
-
+            if (!this.world || this.world.gameEnded) return;
+            this.playCurrentAnimation();
         }, 100);
     }
 
     /**
-     * Reduces the character's energy by 20 and applies knockback after taking damage.
+     * Selects the correct animation based on the character state.
+     */
+    playCurrentAnimation() {
+        if (this.isDead()) return this.playAnimation(this.IMAGES_DEAD);
+        if (this.isHurt()) return this.playAnimation(this.IMAGES_HURT);
+        if (this.isJumping) return this.playAnimation(this.IMAGES_JUMPING);
+        if (this.isWalking()) return this.playAnimation(this.IMAGES_WALKING);
+
+        this.playAnimation(this.IMAGES_IDLE);
+    }
+
+    /**
+     * Checks whether the character is currently walking.
+     * @returns {boolean} True if the character is walking.
+     */
+    isWalking() {
+        return this.world.keyboard.LEFT ||
+            this.world.keyboard.RIGHT;
+    }
+
+    /**
+     * Reduces the character's energy and applies knockback.
      */
     hit() {
-        if (this.world && this.world.gameEnded) {
-            return;
-        }
+        if (this.world?.gameEnded) return;
 
-        this.energy -= 20;
+        this.reduceEnergy();
+        this.lastHit = Date.now();
+        this.applyKnockback();
+    }
 
-        if (this.energy < 0) {
-            this.energy = 0;
-        } else {
-            this.lastHit = new Date().getTime();
-        }
+    /**
+     * Reduces the character's energy by exactly 10 points.
+     */
+    reduceEnergy() {
+        this.energy = Math.max(this.energy - 10, 0);
+    }
 
+    /**
+     * Applies knockback after the character is hit.
+     */
+    applyKnockback() {
         if (this.otherDirection) {
             this.x += 30;
         } else {
@@ -233,17 +241,17 @@ class Character extends MovableObject {
 
     /**
      * Checks whether the character was hurt within the last second.
+     *
      * @returns {boolean} True if the character is currently hurt.
      */
     isHurt() {
-        let timepassed =
-            (new Date().getTime() - this.lastHit) / 1000;
-
-        return timepassed < 1;
+        const timePassed = (Date.now() - this.lastHit) / 1000;
+        return timePassed < 1;
     }
 
     /**
      * Checks whether the character has no remaining energy.
+     *
      * @returns {boolean} True if the character is dead.
      */
     isDead() {
@@ -254,9 +262,7 @@ class Character extends MovableObject {
      * Moves the character to the right.
      */
     moveRight() {
-        if (this.world && this.world.gameEnded) {
-            return;
-        }
+        if (this.world?.gameEnded) return;
 
         this.x += this.speed;
         this.otherDirection = false;
@@ -266,9 +272,7 @@ class Character extends MovableObject {
      * Moves the character to the left.
      */
     moveLeft() {
-        if (this.world && this.world.gameEnded) {
-            return;
-        }
+        if (this.world?.gameEnded) return;
 
         this.x -= this.speed;
         this.otherDirection = true;
@@ -278,15 +282,10 @@ class Character extends MovableObject {
      * Makes the character jump.
      */
     jump() {
-        if (this.world && this.world.gameEnded) {
-            return;
-        }
-
-        if (this.isJumping) {
-            return;
-        }
+        if (this.world?.gameEnded || this.isJumping) return;
 
         this.isJumping = true;
         this.speedY = 30;
     }
 }
+
